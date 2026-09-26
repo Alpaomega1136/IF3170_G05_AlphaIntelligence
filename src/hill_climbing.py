@@ -37,22 +37,36 @@ def steepest_ascent(
     current = initial_state.copy()
     history = [calculate_objective(current)]
 
-    for iteration in range(max_iterations):
-        neighbors = generate_neighbors(current, limit=neighbor_limit, seed=rng.randrange(1_000_000_000))
+    for _ in range(max_iterations):
+        neighbor_seed = rng.randrange(1_000_000_000)
+        neighbors = generate_neighbors(current, limit=neighbor_limit, seed=neighbor_seed)
         if not neighbors:
             break
 
-        best = max(neighbors, key=calculate_objective)
-        best_score = calculate_objective(best)
-        if best_score <= history[-1]:
+        best_neighbor = None
+        best_score = history[-1]
+
+        for neighbor in neighbors:
+            neighbor_score = calculate_objective(neighbor)
+            if neighbor_score > best_score:
+                best_neighbor = neighbor
+                best_score = neighbor_score
+
+        if best_neighbor is None:
             break
 
-        current = best
+        current = best_neighbor
         history.append(best_score)
-    else:
-        iteration = max_iterations - 1
 
-    return _result("steepest_ascent", initial_state, current, history, iteration_count=len(history) - 1, start=start, seed=seed)
+    return _result(
+        "steepest_ascent",
+        initial_state,
+        current,
+        history,
+        iteration_count=len(history) - 1,
+        start=start,
+        seed=seed,
+    )
 
 
 def stochastic_hill_climbing(
@@ -67,8 +81,14 @@ def stochastic_hill_climbing(
     history = [calculate_objective(current)]
 
     for _ in range(max_iterations):
-        neighbors = generate_neighbors(current, limit=neighbor_limit, seed=rng.randrange(1_000_000_000))
-        improving = [neighbor for neighbor in neighbors if calculate_objective(neighbor) > history[-1]]
+        neighbor_seed = rng.randrange(1_000_000_000)
+        neighbors = generate_neighbors(current, limit=neighbor_limit, seed=neighbor_seed)
+        improving = []
+
+        for neighbor in neighbors:
+            if calculate_objective(neighbor) > history[-1]:
+                improving.append(neighbor)
+
         if not improving:
             break
 
@@ -100,20 +120,30 @@ def hill_climbing_sideways(
     sideways_moves = 0
 
     for _ in range(max_iterations):
-        neighbors = generate_neighbors(current, limit=neighbor_limit, seed=rng.randrange(1_000_000_000))
+        neighbor_seed = rng.randrange(1_000_000_000)
+        neighbors = generate_neighbors(current, limit=neighbor_limit, seed=neighbor_seed)
         if not neighbors:
             break
 
-        scored = [(calculate_objective(neighbor), neighbor) for neighbor in neighbors]
-        best_score = max(score for score, _ in scored)
+        best_score = None
+        choices = []
+
+        for neighbor in neighbors:
+            score = calculate_objective(neighbor)
+            if best_score is None or score > best_score:
+                best_score = score
+                choices = [neighbor]
+            elif score == best_score:
+                choices.append(neighbor)
+
+        if best_score is None:
+            break
 
         if best_score > history[-1]:
-            choices = [neighbor for score, neighbor in scored if score == best_score]
             current = rng.choice(choices)
             history.append(best_score)
             sideways_moves = 0
         elif best_score == history[-1] and sideways_moves < max_sideways_moves:
-            choices = [neighbor for score, neighbor in scored if score == best_score]
             current = rng.choice(choices)
             history.append(best_score)
             sideways_moves += 1
@@ -150,17 +180,25 @@ def random_restart_hill_climbing(
     objectives_per_restart: List[int] = []
 
     for _ in range(max_restarts + 1):
-        initial = generate_initial_state(truck, package_tuple, seed=rng.randrange(1_000_000_000))
+        initial_seed = rng.randrange(1_000_000_000)
+        search_seed = rng.randrange(1_000_000_000)
+        initial = generate_initial_state(truck, package_tuple, seed=initial_seed)
         result = steepest_ascent(
             initial,
             max_iterations=max_iterations,
             neighbor_limit=neighbor_limit,
-            seed=rng.randrange(1_000_000_000),
+            seed=search_seed,
         )
         iterations_per_restart.append(result.iterations)
         objectives_per_restart.append(calculate_objective(result.final_state))
 
-        if best_result is None or calculate_objective(result.final_state) > calculate_objective(best_result.final_state):
+        current_score = calculate_objective(result.final_state)
+        if best_result is None:
+            best_result = result
+            continue
+
+        best_score = calculate_objective(best_result.final_state)
+        if current_score > best_score:
             best_result = result
 
     assert best_result is not None
