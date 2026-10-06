@@ -1,0 +1,24 @@
+{
+  "run": 3,
+  "seed": 999,
+  "objective_mode": "eta_weighted",
+  "objective_formula": "sum(value * (1 + 1 / (ETA + 1)))",
+  "initial_objective": 708.8511904761905,
+  "final_objective": 760.8333333333334,
+  "best_objective": 775.875,
+  "initial_total_value": 585,
+  "final_total_value": 560,
+  "best_total_value": 580,
+  "iterations": 1000,
+  "duration_seconds": 5.952273899980355,
+  "accepted_moves": 679,
+  "accepted_better_or_equal_moves": 665,
+  "accepted_worse_moves": 14,
+  "rejected_moves": 321,
+  "stuck_count": 1,
+  "stuck_iterations": [
+    227
+  ],
+  "longest_no_improvement_streak": 878,
+  "stop_reason": "max_iterations"
+}

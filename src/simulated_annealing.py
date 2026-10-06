@@ -29,7 +29,7 @@ def calculate_eta_weighted_objective(state: State) -> float:
         if package.eta < 0: raise ValueError("Package ETA must be >= 0")
         urgency_multiplier = (1.0 + (1.0 / (package.eta + 1)))
         total_score += (package.value * urgency_multiplier)
-        return total_score
+    return total_score
 
 
 def calculate_sa_objective(

@@ -1,0 +1,25 @@
+{
+  "run": 1,
+  "seed": 42,
+  "objective_mode": "value",
+  "objective_formula": "sum(value)",
+  "initial_objective": 530.0,
+  "final_objective": 575.0,
+  "best_objective": 575.0,
+  "initial_total_value": 530,
+  "final_total_value": 575,
+  "best_total_value": 575,
+  "iterations": 1000,
+  "duration_seconds": 8.694716099998914,
+  "accepted_moves": 791,
+  "accepted_better_or_equal_moves": 771,
+  "accepted_worse_moves": 20,
+  "rejected_moves": 209,
+  "stuck_count": 2,
+  "stuck_iterations": [
+    155,
+    239
+  ],
+  "longest_no_improvement_streak": 811,
+  "stop_reason": "max_iterations"
+}
