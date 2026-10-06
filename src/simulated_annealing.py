@@ -19,7 +19,7 @@ OBJECTIVE_ETA_WEIGHTED = "eta_weighted"
 
 def calculate_eta_weighted_objective(state: State) -> float:
     packages = {
-        package.id: packages
+        package.id: package
         for package in state.packages
     }
     total_score = 0.0
@@ -192,7 +192,7 @@ def simulated_annealing(initial_state: State, initial_temperature: float = 100.0
         temperature_history=(temperature_history),
         delta_e_history=delta_e_history,
         acceptance_probability_history=(acceptance_probability_history),
-        accepted_history=accepted_history=,
+        accepted_history=accepted_history,
         iterations=iterations,
         duration=duration,
 
