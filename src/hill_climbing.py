@@ -5,7 +5,7 @@ import random
 import time
 from typing import Dict, Iterable, List, Optional
 
-from core import (
+from src.core import (
     Package,
     State,
     Truck,
