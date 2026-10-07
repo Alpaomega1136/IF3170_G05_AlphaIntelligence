@@ -1,0 +1,131 @@
+from __future__ import annotations
+
+import csv
+import json
+from pathlib import Path
+from typing import Any, Callable, Dict
+
+from src.core import State, calculate_objective
+from src.simulated_annealing import calculate_sa_objective
+from src.visualization import save_sa_visualizations
+
+OutputSaver = Callable[[object, Dict[str, Any], str | Path], Path]
+OUTPUT_SAVERS: Dict[str, OutputSaver] = {}
+
+
+def register_output_saver(algorithm_name: str):
+    def decorator(func: OutputSaver) -> OutputSaver:
+        OUTPUT_SAVERS[algorithm_name] = func
+        return func
+
+    return decorator
+
+
+def state_to_dict(state: State, objective_score: float) -> Dict[str, Any]:
+    packages = {package.id: package for package in state.packages}
+
+    inside = []
+
+    for package_id, placement in sorted(state.placements.items()):
+        package = packages[package_id]
+
+        inside.append({"id": package.id, "width": package.width, "length": package.length,
+            "height": package.height, "value": package.value, "weight": package.weight,
+            "is_fragile": package.is_fragile, "eta": package.eta, "position": {"x": placement.x,
+                "y": placement.y, "z": placement.z}, "orientation": placement.orientation})
+
+    outside = [package.id for package in state.packages if package.id not in state.placements]
+
+    total_weight = sum(packages[package_id].weight for package_id in state.placements)
+
+    return {"truck": {"width": state.truck.width, "length": state.truck.length,
+            "height": state.truck.height, "max_capacity": state.truck.max_capacity},
+        "objective_score": objective_score, "total_value": calculate_objective(state),
+        "total_weight": total_weight, "inside_packages": inside, "outside_packages": outside}
+
+
+def _write_json(path: Path, data: Dict[str, Any]) -> None:
+    with path.open("w", encoding="utf-8") as file:
+        json.dump(data, file, indent=2)
+
+
+def _write_sa_history(run_dir: Path, result) -> None:
+    history_path = run_dir / "history.csv"
+
+    with history_path.open("w", newline="", encoding="utf-8") as file:
+        writer = csv.writer(file)
+
+        writer.writerow(["iteration", "current_objective", "best_objective", "neighbor_objective",
+            "temperature", "delta_e", "acceptance_probability", "accepted"])
+
+        for i in range(result.iterations):
+            writer.writerow([i + 1, result.objective_history[i + 1],
+                result.best_objective_history[i + 1], result.neighbor_objective_history[i],
+                result.temperature_history[i], result.delta_e_history[i],
+                result.acceptance_probability_history[i], result.accepted_history[i]])
+
+
+def _remove_obsolete_sa_outputs(run_dir: Path) -> None:
+    obsolete_files = ("temperature_history.png", "best_state.png", "best_objective_history.png")
+
+    for filename in obsolete_files:
+        path = run_dir / filename
+        if path.exists():
+            path.unlink()
+
+
+@register_output_saver("simulated_annealing")
+def save_sa_outputs(result, parameters: Dict[str, Any], input_file: str | Path) -> Path:
+    objective_mode = result.metadata["objective_mode"]
+
+    run_name = Path(input_file).stem
+
+    run_dir = (Path("output") / "simulated_annealing" / objective_mode / run_name)
+    run_dir.mkdir(parents=True, exist_ok=True)
+
+    _remove_obsolete_sa_outputs(run_dir)
+
+    states = {"initial_state": state_to_dict(result.initial_state, calculate_sa_objective(
+                result.initial_state, objective_mode)), "final_state": state_to_dict(
+            result.final_state, calculate_sa_objective(result.final_state, objective_mode))}
+
+    _write_json(run_dir / "states.json", states)
+
+    summary = {"algorithm": "simulated_annealing", "objective_mode": objective_mode,
+        "seed": parameters.get("seed", result.metadata.get("seed")), "configuration": {
+            "initial_temperature": result.metadata["initial_temperature"],
+            "cooling_rate": result.metadata["cooling_rate"], "min_temperature": result.metadata[
+                "min_temperature"], "max_iterations": result.metadata["max_iterations"],
+            "stuck_threshold": result.metadata["stuck_threshold"],
+            "local_optimum_probe_size": result.metadata["local_optimum_probe_size"]}, "result": {
+            "initial_objective": result.metadata["initial_objective"],
+            "final_objective": result.metadata["final_objective"],
+            "best_objective": result.metadata["best_objective"],
+            "initial_total_value": result.metadata["initial_total_value"],
+            "final_total_value": result.metadata["final_total_value"],
+            "best_total_value": result.metadata["best_total_value"],
+            "iterations": result.iterations, "duration_seconds": result.duration,
+            "final_temperature": result.metadata["final_temperature"],
+            "stop_reason": result.metadata["stop_reason"]}, "sa_statistics": {
+            "accepted_moves": result.metadata["accepted_moves"],
+            "accepted_worse_moves": result.metadata["accepted_worse_moves"],
+            "rejected_moves": result.metadata["rejected_moves"], "stuck_count": result.metadata[
+                "stuck_count"], "stuck_iterations": result.metadata["stuck_iterations"]}}
+
+    _write_json(run_dir / "summary.json", summary)
+
+    _write_sa_history(run_dir, result)
+
+    save_sa_visualizations(result, run_dir, show=False)
+
+    return run_dir
+
+
+def save_algorithm_outputs(algorithm_name: str, result, parameters: Dict[str, Any],
+    input_file: str | Path) -> Path | None:
+    saver = OUTPUT_SAVERS.get(algorithm_name)
+
+    if saver is None:
+        return None
+
+    return saver(result, parameters, input_file)
