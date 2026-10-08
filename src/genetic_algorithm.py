@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 import random
-from typing import Iterable, List, Tuple
+import time
+from typing import Dict, Iterable, List, Optional, Tuple
 
 from src.core import (
     ORIENTATIONS,
@@ -14,6 +16,17 @@ from src.core import (
     is_valid_state,
     validate_state,
 )
+
+
+@dataclass
+class GeneticAlgorithmResult:
+    initial_state: State
+    final_state: State
+    objective_history: List[int]
+    mean_objective_history: List[float]
+    iterations: int
+    duration: float
+    metadata: Dict[str, object]
 
 
 def initialize_population(
@@ -95,3 +108,46 @@ def next_generation(population: List[State], rng: random.Random) -> List[State]:
         child = uniform_crossover(parent_a, parent_b, rng)
         children.append(mutate(child, rng))
     return children
+
+
+def genetic_algorithm(
+    truck: Truck,
+    packages: Iterable[Package],
+    population_size: int = 50,
+    max_iterations: int = 100,
+    seed: Optional[int] = None,
+) -> GeneticAlgorithmResult:
+    if isinstance(max_iterations, bool) or not isinstance(max_iterations, int) or max_iterations < 0:
+        raise ValueError("max_iterations must be an integer >= 0")
+    if seed is not None and (isinstance(seed, bool) or not isinstance(seed, int)):
+        raise ValueError("seed must be an integer or null")
+
+    start = time.perf_counter()
+    rng = random.Random(seed)
+    population = initialize_population(truck, packages, population_size, rng)
+    fitness_scores, best, mean = evaluate_population(population)
+    initial_state = best.copy()
+    objective_history = [max(fitness_scores)]
+    mean_objective_history = [mean]
+
+    for _ in range(max_iterations):
+        population = next_generation(population, rng)
+        fitness_scores, best, mean = evaluate_population(population)
+        objective_history.append(max(fitness_scores))
+        mean_objective_history.append(mean)
+
+    return GeneticAlgorithmResult(
+        initial_state=initial_state,
+        final_state=best,
+        objective_history=objective_history,
+        mean_objective_history=mean_objective_history,
+        iterations=max_iterations,
+        duration=time.perf_counter() - start,
+        metadata={
+            "algorithm": "genetic_algorithm",
+            "seed": seed,
+            "population_size": population_size,
+            "max_iterations": max_iterations,
+            "is_valid_final_state": is_valid_state(best),
+        },
+    )
