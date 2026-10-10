@@ -1,0 +1,140 @@
+{
+  "problem": {
+    "truck": {
+      "width": 8,
+      "length": 8,
+      "height": 5,
+      "max_capacity": 40
+    },
+    "packages": [
+      {
+        "id": "A",
+        "width": 4,
+        "length": 4,
+        "height": 2,
+        "value": 140,
+        "weight": 10,
+        "is_fragile": false,
+        "eta": 3
+      },
+      {
+        "id": "B",
+        "width": 4,
+        "length": 3,
+        "height": 2,
+        "value": 120,
+        "weight": 9,
+        "is_fragile": false,
+        "eta": 2
+      },
+      {
+        "id": "C",
+        "width": 3,
+        "length": 3,
+        "height": 2,
+        "value": 95,
+        "weight": 7,
+        "is_fragile": false,
+        "eta": 5
+      },
+      {
+        "id": "D",
+        "width": 5,
+        "length": 3,
+        "height": 2,
+        "value": 160,
+        "weight": 12,
+        "is_fragile": false,
+        "eta": 1
+      },
+      {
+        "id": "E",
+        "width": 2,
+        "length": 2,
+        "height": 2,
+        "value": 70,
+        "weight": 5,
+        "is_fragile": true,
+        "eta": 4
+      },
+      {
+        "id": "F",
+        "width": 3,
+        "length": 2,
+        "height": 2,
+        "value": 85,
+        "weight": 6,
+        "is_fragile": false,
+        "eta": 6
+      },
+      {
+        "id": "G",
+        "width": 4,
+        "length": 2,
+        "height": 1,
+        "value": 75,
+        "weight": 5,
+        "is_fragile": false,
+        "eta": 2
+      },
+      {
+        "id": "H",
+        "width": 2,
+        "length": 2,
+        "height": 1,
+        "value": 55,
+        "weight": 3,
+        "is_fragile": true,
+        "eta": 3
+      },
+      {
+        "id": "I",
+        "width": 3,
+        "length": 3,
+        "height": 1,
+        "value": 90,
+        "weight": 6,
+        "is_fragile": false,
+        "eta": 1
+      },
+      {
+        "id": "J",
+        "width": 5,
+        "length": 2,
+        "height": 2,
+        "value": 130,
+        "weight": 10,
+        "is_fragile": false,
+        "eta": 5
+      },
+      {
+        "id": "K",
+        "width": 2,
+        "length": 3,
+        "height": 2,
+        "value": 80,
+        "weight": 6,
+        "is_fragile": false,
+        "eta": 4
+      },
+      {
+        "id": "L",
+        "width": 3,
+        "length": 2,
+        "height": 1,
+        "value": 65,
+        "weight": 4,
+        "is_fragile": false,
+        "eta": 7
+      }
+    ]
+  },
+  "algorithm": {
+    "name": "genetic_algorithm",
+    "parameters": {
+      "population_size": 20,
+      "max_iterations": 200,
+      "seed": 42
+    }
+  }
+}

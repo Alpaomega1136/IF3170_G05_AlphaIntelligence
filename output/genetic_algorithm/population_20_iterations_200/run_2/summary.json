@@ -1,0 +1,27 @@
+{
+  "algorithm": "genetic_algorithm",
+  "seed": 123,
+  "configuration": {
+    "population_size": 20,
+    "max_iterations": 200
+  },
+  "operators": {
+    "selection": "tournament",
+    "tournament_size": 3,
+    "crossover": "uniform",
+    "parent_a_probability": 0.5,
+    "mutation_rate": 0.1,
+    "elite_count": 1,
+    "repair": "greedy_bottom_up"
+  },
+  "result": {
+    "initial_objective": 585,
+    "final_objective": 585,
+    "initial_mean_objective": 547.5,
+    "final_mean_objective": 580.5,
+    "iterations": 200,
+    "duration_seconds": 7.106371600064449,
+    "is_valid_final_state": true
+  },
+  "duration_scope": "population initialization and evolution; excludes IO and visualization"
+}
