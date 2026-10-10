@@ -4,6 +4,7 @@ import argparse
 from typing import Any, Dict, Iterable
 
 from src.core import (Package, Truck, calculate_objective, generate_initial_state, validate_state)
+from src.genetic_algorithm import genetic_algorithm
 from src.hill_climbing import (hill_climbing_sideways, random_restart_hill_climbing,
     steepest_ascent, stochastic_hill_climbing)
 from src.output_manager import save_algorithm_outputs
@@ -18,14 +19,16 @@ ALGORITHM_ALIASES = {"steepest": "steepest_ascent", "steepest_ascent": "steepest
     "random_restart": "random_restart_hill_climbing",
     "random-restart": "random_restart_hill_climbing",
     "random_restart_hill_climbing": "random_restart_hill_climbing", "sa": "simulated_annealing",
-    "simulated_annealing": "simulated_annealing"}
+    "simulated_annealing": "simulated_annealing", "ga": "genetic_algorithm",
+    "genetic_algorithm": "genetic_algorithm"}
 
 ALLOWED_PARAMETERS = {"steepest_ascent": {"seed", "max_iterations", "neighbor_limit"},
     "stochastic_hill_climbing": {"seed", "max_iterations", "neighbor_limit"},
     "hill_climbing_sideways": {"seed", "max_iterations", "neighbor_limit", "max_sideways_moves"},
     "random_restart_hill_climbing": {"seed", "max_restarts", "max_iterations", "neighbor_limit"},
     "simulated_annealing": {"seed", "initial_temperature", "cooling_rate", "min_temperature",
-        "max_iterations", "stuck_threshold", "local_optimum_probe_size", "objective_mode"}}
+        "max_iterations", "stuck_threshold", "local_optimum_probe_size", "objective_mode"},
+    "genetic_algorithm": {"seed", "population_size", "max_iterations"}}
 
 
 def _normalize_algorithm_name(name: str) -> str:
@@ -62,6 +65,8 @@ def run_algorithm(truck: Truck, packages: Iterable[Package], algorithm_name: str
 
     if algorithm_name == "random_restart_hill_climbing":
         return algorithm_name, random_restart_hill_climbing(truck, package_tuple, **params)
+    if algorithm_name == "genetic_algorithm":
+        return algorithm_name, genetic_algorithm(truck, package_tuple, **params)
 
     initial_state = generate_initial_state(truck, package_tuple, seed=seed)
 
@@ -105,6 +110,10 @@ def print_result(algorithm_name: str, result) -> None:
         elif algorithm_name == "random_restart_hill_climbing":
             print(f"Restart count: {result.metadata['restart_count']}")
             print("Iterations per restart: " f"{result.metadata['iterations_per_restart']}")
+        elif algorithm_name == "genetic_algorithm":
+            print(f"Population size: {result.metadata['population_size']}")
+            print(f"Initial population mean: {result.mean_objective_history[0]:.2f}")
+            print(f"Final population mean: {result.mean_objective_history[-1]:.2f}")
 
     print(f"Iterations: {result.iterations}")
     print(f"Duration: {result.duration:.6f}s")

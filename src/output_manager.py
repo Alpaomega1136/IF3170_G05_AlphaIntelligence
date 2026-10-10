@@ -7,7 +7,7 @@ from typing import Any, Callable, Dict
 
 from src.core import State, calculate_objective
 from src.simulated_annealing import calculate_sa_objective
-from src.visualization import save_sa_visualizations
+from src.visualization import plot_objective_history, save_sa_visualizations, visualize_state
 
 OutputSaver = Callable[[object, Dict[str, Any], str | Path], Path]
 OUTPUT_SAVERS: Dict[str, OutputSaver] = {}
@@ -118,6 +118,46 @@ def save_sa_outputs(result, parameters: Dict[str, Any], input_file: str | Path) 
 
     save_sa_visualizations(result, run_dir, show=False)
 
+    return run_dir
+
+
+@register_output_saver("genetic_algorithm")
+def save_ga_outputs(result, parameters: Dict[str, Any], input_file: str | Path) -> Path:
+    population_size = result.metadata["population_size"]
+    max_iterations = result.metadata["max_iterations"]
+    run_dir = (Path("output") / "genetic_algorithm" /
+               f"population_{population_size}_iterations_{max_iterations}" / Path(input_file).stem)
+    run_dir.mkdir(parents=True, exist_ok=True)
+
+    states = {"initial_state": state_to_dict(result.initial_state, calculate_objective(result.initial_state)),
+              "final_state": state_to_dict(result.final_state, calculate_objective(result.final_state))}
+    _write_json(run_dir / "states.json", states)
+    summary = {"algorithm": "genetic_algorithm", "seed": result.metadata["seed"],
+        "configuration": {"population_size": population_size, "max_iterations": max_iterations},
+        "operators": {"selection": "tournament", "tournament_size": min(3, population_size),
+            "crossover": "uniform", "parent_a_probability": 0.5, "mutation_rate": 0.1,
+            "elite_count": 1, "repair": "greedy_bottom_up"},
+        "result": {"initial_objective": result.objective_history[0],
+            "final_objective": result.objective_history[-1],
+            "initial_mean_objective": result.mean_objective_history[0],
+            "final_mean_objective": result.mean_objective_history[-1],
+            "iterations": result.iterations, "duration_seconds": result.duration,
+            "is_valid_final_state": result.metadata["is_valid_final_state"]},
+        "duration_scope": "population initialization and evolution; excludes IO and visualization"}
+    _write_json(run_dir / "summary.json", summary)
+
+    with (run_dir / "history.csv").open("w", newline="", encoding="utf-8") as file:
+        writer = csv.writer(file)
+        writer.writerow(["generation", "max_objective", "mean_objective"])
+        for generation in range(result.iterations + 1):
+            writer.writerow([generation, result.objective_history[generation],
+                             result.mean_objective_history[generation]])
+
+    visualize_state(result.initial_state, title="Initial State (Best Individual)",
+                    output_path=run_dir / "initial_state.png")
+    visualize_state(result.final_state, title="Final State (Best Individual)",
+                    output_path=run_dir / "final_state.png")
+    plot_objective_history(result, output_path=run_dir / "objective_history.png")
     return run_dir
 
 

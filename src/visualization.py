@@ -170,17 +170,21 @@ def plot_objective_history(result, output_path: Optional[str | Path] = None, sho
 
     fig, ax = plt.subplots(figsize=(10, 5))
 
-    ax.plot(iterations, result.objective_history, label="Current objective",
-        color=CURRENT_LINE_COLOR, linewidth=1.6)
-
-    ax.plot(iterations, result.best_objective_history, label="Best objective",
-        color=BEST_LINE_COLOR, linewidth=2.0)
-
-    objective_mode = result.metadata.get("objective_mode", "value")
-
-    ax.set_title("Objective Value vs Iteration" f"\nObjective mode: {objective_mode}")
-
-    ax.set_xlabel("Iteration")
+    if result.metadata.get("algorithm") == "genetic_algorithm":
+        ax.plot(iterations, result.objective_history, label="Maximum objective",
+            color=BEST_LINE_COLOR, linewidth=2.0, marker="o", markersize=3)
+        ax.plot(iterations, result.mean_objective_history, label="Mean objective",
+            color=CURRENT_LINE_COLOR, linewidth=1.6, marker="o", markersize=3)
+        ax.set_title("Genetic Algorithm: Population Fitness")
+        ax.set_xlabel("Generation")
+    else:
+        ax.plot(iterations, result.objective_history, label="Current objective",
+            color=CURRENT_LINE_COLOR, linewidth=1.6)
+        ax.plot(iterations, result.best_objective_history, label="Best objective",
+            color=BEST_LINE_COLOR, linewidth=2.0)
+        objective_mode = result.metadata.get("objective_mode", "value")
+        ax.set_title("Objective Value vs Iteration" f"\nObjective mode: {objective_mode}")
+        ax.set_xlabel("Iteration")
     ax.set_ylabel("Objective value")
     ax.grid(True, alpha=0.25)
     ax.legend()
