@@ -64,6 +64,7 @@ class PlacedPackage:
     y: int
     z: int
     orientation: Orientation = DEFAULT_ORIENTATION
+    truck_index: int = 0
 
     @property
     def position(self) -> Position:
@@ -75,9 +76,21 @@ class State:
     truck: Truck
     packages: Tuple[Package, ...]
     placements: Dict[str, PlacedPackage]
+    additional_trucks: Tuple[Truck, ...] = ()
+
+    @property
+    def trucks(self) -> Tuple[Truck, ...]:
+        return (self.truck,) + self.additional_trucks
 
     def copy(self) -> "State":
-        return State(self.truck, self.packages, dict(self.placements))
+        return State(self.truck, self.packages, dict(self.placements), self.additional_trucks)
+
+
+def get_truck_state(state: State, truck_index: int) -> State:
+    placements = {package_id: replace(place, truck_index=0)
+                  for package_id, place in state.placements.items() if place.truck_index == truck_index}
+    packages = tuple(package for package in state.packages if package.id in placements)
+    return State(state.trucks[truck_index], packages, placements)
 
 
 # Geometry Helpers
@@ -145,6 +158,8 @@ def _intervals_overlap(a0: int, a1: int, b0: int, b1: int) -> bool:
 
 def _xy_overlap(package_a: Package, place_a: PlacedPackage,
                 package_b: Package, place_b: PlacedPackage) -> bool:
+    if place_a.truck_index != place_b.truck_index:
+        return False
     ax0, ax1, ay0, ay1, _, _ = _bounds(package_a, place_a)
     bx0, bx1, by0, by1, _, _ = _bounds(package_b, place_b)
     x_overlaps = _intervals_overlap(ax0, ax1, bx0, bx1)
@@ -154,6 +169,8 @@ def _xy_overlap(package_a: Package, place_a: PlacedPackage,
 
 def is_overlapping(package_a: Package, place_a: PlacedPackage,
                    package_b: Package, place_b: PlacedPackage) -> bool:
+    if place_a.truck_index != place_b.truck_index:
+        return False
     ax0, ax1, ay0, ay1, az0, az1 = _bounds(package_a, place_a)
     bx0, bx1, by0, by1, bz0, bz1 = _bounds(package_b, place_b)
     x_overlaps = _intervals_overlap(ax0, ax1, bx0, bx1)
@@ -193,6 +210,21 @@ def validate_state(state: State) -> Tuple[bool, List[str]]:
     unknown_ids = set(state.placements) - set(packages)
     if unknown_ids:
         reasons.append("UNKNOWN_PACKAGE")
+
+    for placement in state.placements.values():
+        if (isinstance(placement.truck_index, bool) or not isinstance(placement.truck_index, int)
+                or not 0 <= placement.truck_index < len(state.trucks)):
+            return False, sorted(set(reasons + ["INVALID_TRUCK_INDEX"]))
+        if placement.orientation not in ORIENTATIONS:
+            return False, sorted(set(reasons + ["INVALID_ORIENTATION"]))
+        if any(isinstance(value, bool) or not isinstance(value, int) for value in placement.position):
+            return False, sorted(set(reasons + ["INVALID_COORDINATE"]))
+
+    if state.additional_trucks:
+        for truck_index in range(len(state.trucks)):
+            _, truck_reasons = validate_state(get_truck_state(state, truck_index))
+            reasons.extend(f"TRUCK_{truck_index + 1}_{reason}" for reason in truck_reasons)
+        return not reasons, sorted(set(reasons))
 
     total_weight = 0
     for package_id in state.placements:
@@ -260,13 +292,29 @@ def calculate_objective(state: State) -> int:
 # State Initialization
 
 def generate_initial_state(
-    truck: Truck,
+    truck: Truck | Tuple[Truck, ...],
     packages: Iterable[Package],
     seed: Optional[int] = None,
     attempts_per_package: int = 100,
 ) -> State:
     rng = random.Random(seed)
     package_list = tuple(packages)
+    if isinstance(truck, tuple):
+        if not truck:
+            raise ValueError("At least one truck is required")
+        if len(truck) == 1:
+            return generate_initial_state(truck[0], package_list, seed, attempts_per_package)
+        state = State(truck[0], package_list, {}, truck[1:])
+        truck_indices = list(range(len(truck)))
+        rng.shuffle(truck_indices)
+        # shortcut: random sequential packing, consider joint packing if initialization quality stalls.
+        for truck_index in truck_indices:
+            remaining = tuple(package for package in package_list if package.id not in state.placements)
+            local = generate_initial_state(truck[truck_index], remaining,
+                seed=rng.randrange(1_000_000_000), attempts_per_package=attempts_per_package)
+            state.placements.update({package_id: replace(place, truck_index=truck_index)
+                                     for package_id, place in local.placements.items()})
+        return state
     state = State(truck, package_list, {})
     shuffled = list(package_list)
     rng.shuffle(shuffled)
@@ -345,13 +393,16 @@ def move_package(
     package_id: str,
     position: Optional[Position],
     require_valid: bool = True,
+    *,
+    truck_index: Optional[int] = None,
 ) -> Optional[State]:
     candidate = state.copy()
     if position is None:
         candidate.placements.pop(package_id, None)
     else:
         old = candidate.placements.get(package_id, PlacedPackage(0, 0, 0, DEFAULT_ORIENTATION))
-        candidate.placements[package_id] = replace(old, x=position[0], y=position[1], z=position[2])
+        candidate.placements[package_id] = replace(old, x=position[0], y=position[1], z=position[2],
+            truck_index=old.truck_index if truck_index is None else truck_index)
 
     if require_valid and not is_valid_state(candidate):
         return None
@@ -453,22 +504,25 @@ def _random_move(state: State, package_id: str, rng: random.Random) -> Optional[
     package = get_package(state, package_id)
     orientation = state.placements.get(package_id, PlacedPackage(0, 0, 0)).orientation
     width, length, height = get_oriented_dimensions(package, orientation)
-    if width > state.truck.width or length > state.truck.length or height > state.truck.height:
+    truck_index = rng.randrange(len(state.trucks)) if state.additional_trucks else 0
+    truck = state.trucks[truck_index]
+    if width > truck.width or length > truck.length or height > truck.height:
         return None
     return move_package(
         state,
         package_id,
         (
-            rng.randint(0, state.truck.width - width),
-            rng.randint(0, state.truck.length - length),
-            rng.randint(0, state.truck.height - height),
+            rng.randint(0, truck.width - width),
+            rng.randint(0, truck.length - length),
+            rng.randint(0, truck.height - height),
         ),
+        truck_index=truck_index,
     )
 
 
-def _state_key(state: State) -> Tuple[Tuple[str, Tuple[int, int, int, Orientation]], ...]:
+def _state_key(state: State) -> Tuple[Tuple[str, Tuple[int, int, int, Orientation, int]], ...]:
     key_items = []
     for package_id, place in state.placements.items():
-        placement_data = (place.x, place.y, place.z, place.orientation)
+        placement_data = (place.x, place.y, place.z, place.orientation, place.truck_index)
         key_items.append((package_id, placement_data))
     return tuple(sorted(key_items))

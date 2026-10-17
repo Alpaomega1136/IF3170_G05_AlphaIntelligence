@@ -30,7 +30,7 @@ class GeneticAlgorithmResult:
 
 
 def initialize_population(
-    truck: Truck,
+    truck: Truck | Tuple[Truck, ...],
     packages: Iterable[Package],
     population_size: int,
     rng: random.Random,
@@ -66,9 +66,10 @@ def tournament_selection(population: List[State], fitness_scores: List[int], rng
 
 
 def repair_state(state: State) -> State:
-    child = State(state.truck, state.packages, {})
+    child = State(state.truck, state.packages, {}, state.additional_trucks)
     selected = [(package.id, state.placements[package.id]) for package in state.packages
                 if package.id in state.placements]
+    # shortcut: drops infeasible inherited genes, revisit reinsertion if solution quality stalls.
     for package_id, placement in sorted(selected, key=lambda item: item[1].z):
         if placement.orientation not in ORIENTATIONS:
             continue
@@ -80,9 +81,9 @@ def repair_state(state: State) -> State:
 
 
 def uniform_crossover(parent_a: State, parent_b: State, rng: random.Random) -> State:
-    if parent_a.truck != parent_b.truck or parent_a.packages != parent_b.packages:
+    if parent_a.trucks != parent_b.trucks or parent_a.packages != parent_b.packages:
         raise ValueError("parents must use the same truck and ordered packages")
-    child = State(parent_a.truck, parent_a.packages, {})
+    child = State(parent_a.truck, parent_a.packages, {}, parent_a.additional_trucks)
     for package in child.packages:
         parent = parent_a if rng.random() < 0.5 else parent_b
         placement = parent.placements.get(package.id)
@@ -111,7 +112,7 @@ def next_generation(population: List[State], rng: random.Random) -> List[State]:
 
 
 def genetic_algorithm(
-    truck: Truck,
+    truck: Truck | Tuple[Truck, ...],
     packages: Iterable[Package],
     population_size: int = 50,
     max_iterations: int = 100,

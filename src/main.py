@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import argparse
-from typing import Any, Dict, Iterable
+from typing import Any, Dict, Iterable, Tuple
 
-from src.core import (Package, Truck, calculate_objective, generate_initial_state, validate_state)
+from src.core import (Package, Truck, calculate_objective, generate_initial_state, get_truck_state, validate_state)
 from src.genetic_algorithm import genetic_algorithm
 from src.hill_climbing import (hill_climbing_sideways, random_restart_hill_climbing,
     steepest_ascent, stochastic_hill_climbing)
@@ -54,7 +54,7 @@ def _initial_seed(parameters: Dict[str, Any]) -> int | None:
     return seed
 
 
-def run_algorithm(truck: Truck, packages: Iterable[Package], algorithm_name: str,
+def run_algorithm(truck: Truck | Tuple[Truck, ...], packages: Iterable[Package], algorithm_name: str,
     parameters: Dict[str, Any]):
     algorithm_name = _normalize_algorithm_name(algorithm_name)
     _validate_parameters(algorithm_name, parameters)
@@ -120,6 +120,11 @@ def print_result(algorithm_name: str, result) -> None:
     if reasons:
         print(f"Invalid reasons: {', '.join(reasons)}")
     print(f"Placed packages: {sorted(result.final_state.placements)}")
+    if result.final_state.additional_trucks:
+        print(f"Truck count: {len(result.final_state.trucks)}")
+        for index in range(len(result.final_state.trucks)):
+            local = get_truck_state(result.final_state, index)
+            print(f"Truck {index + 1}: value={calculate_objective(local)}, packages={sorted(local.placements)}")
 
 
 def main() -> None:
@@ -130,7 +135,8 @@ def main() -> None:
 
     try:
         program_input = load_input(args.input_file)
-        algorithm_name, result = run_algorithm(program_input.truck, program_input.packages,
+        truck = program_input.trucks if program_input.additional_trucks else program_input.truck
+        algorithm_name, result = run_algorithm(truck, program_input.packages,
             program_input.algorithm_name, program_input.parameters)
     except (ValueError, TypeError) as exc:
         parser.error(str(exc))
