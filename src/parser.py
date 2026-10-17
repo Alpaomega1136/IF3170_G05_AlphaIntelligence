@@ -14,6 +14,11 @@ class ProgramInput:
     packages: Tuple[Package, ...]
     algorithm_name: str
     parameters: Dict[str, Any]
+    additional_trucks: Tuple[Truck, ...] = ()
+
+    @property
+    def trucks(self) -> Tuple[Truck, ...]:
+        return (self.truck,) + self.additional_trucks
 
 
 def _require_int(data: dict, key: str, context: str, *, minimum: int | None = None) -> int:
@@ -51,14 +56,20 @@ def load_input(path: str | Path) -> ProgramInput:
     if not isinstance(problem, dict):
         raise ValueError("problem must be an object")
 
-    truck_data = problem.get("truck")
-    if not isinstance(truck_data, dict):
-        raise ValueError("problem.truck must be an object")
-
-    truck = Truck(width=_require_int(truck_data, "width", "problem.truck", minimum=1),
-        length=_require_int(truck_data, "length", "problem.truck", minimum=1),
-        height=_require_int(truck_data, "height", "problem.truck", minimum=1),
-        max_capacity=_require_int(truck_data, "max_capacity", "problem.truck", minimum=0))
+    if ("truck" in problem) == ("trucks" in problem):
+        raise ValueError("problem must contain exactly one of truck or trucks")
+    trucks_data = problem.get("trucks") if "trucks" in problem else [problem["truck"]]
+    if not isinstance(trucks_data, list) or not trucks_data:
+        raise ValueError("problem.trucks must be a non-empty array")
+    trucks = []
+    for index, truck_data in enumerate(trucks_data):
+        context = f"problem.trucks[{index}]" if "trucks" in problem else "problem.truck"
+        if not isinstance(truck_data, dict):
+            raise ValueError(f"{context} must be an object")
+        trucks.append(Truck(width=_require_int(truck_data, "width", context, minimum=1),
+            length=_require_int(truck_data, "length", context, minimum=1),
+            height=_require_int(truck_data, "height", context, minimum=1),
+            max_capacity=_require_int(truck_data, "max_capacity", context, minimum=0)))
 
     packages_data = problem.get("packages")
     if not isinstance(packages_data, list):
@@ -100,5 +111,6 @@ def load_input(path: str | Path) -> ProgramInput:
     if not isinstance(parameters, dict):
         raise ValueError("algorithm.parameters must be an object")
 
-    return ProgramInput(truck=truck, packages=tuple(packages),
-        algorithm_name=algorithm_name.strip().lower(), parameters=dict(parameters))
+    return ProgramInput(truck=trucks[0], packages=tuple(packages),
+        algorithm_name=algorithm_name.strip().lower(), parameters=dict(parameters),
+        additional_trucks=tuple(trucks[1:]))

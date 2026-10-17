@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 import random
 import time
-from typing import Dict, Iterable, List, Optional
+from typing import Dict, Iterable, List, Optional, Tuple
 
 from src.core import (
     Package,
@@ -165,7 +165,7 @@ def hill_climbing_sideways(
 
 
 def random_restart_hill_climbing(
-    truck: Truck,
+    truck: Truck | Tuple[Truck, ...],
     packages: Iterable[Package],
     max_restarts: int = 5,
     max_iterations: int = 100,

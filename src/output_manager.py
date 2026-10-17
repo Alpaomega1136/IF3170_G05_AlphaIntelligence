@@ -5,9 +5,9 @@ import json
 from pathlib import Path
 from typing import Any, Callable, Dict
 
-from src.core import State, calculate_objective
+from src.core import State, calculate_objective, get_truck_state
 from src.simulated_annealing import calculate_sa_objective
-from src.visualization import save_sa_visualizations
+from src.visualization import plot_objective_history, save_sa_visualizations, visualize_state
 
 OutputSaver = Callable[[object, Dict[str, Any], str | Path], Path]
 OUTPUT_SAVERS: Dict[str, OutputSaver] = {}
@@ -23,6 +23,19 @@ def register_output_saver(algorithm_name: str):
 
 def state_to_dict(state: State, objective_score: float) -> Dict[str, Any]:
     packages = {package.id: package for package in state.packages}
+    if state.additional_trucks:
+        trucks = []
+        for index in range(len(state.trucks)):
+            local = get_truck_state(state, index)
+            data = state_to_dict(local, calculate_objective(local))
+            data.pop("outside_packages")
+            data.pop("objective_score")
+            data["truck_index"] = index
+            trucks.append(data)
+        return {"trucks": trucks, "objective_score": objective_score,
+            "total_value": calculate_objective(state),
+            "total_weight": sum(packages[package_id].weight for package_id in state.placements),
+            "outside_packages": [p.id for p in state.packages if p.id not in state.placements]}
 
     inside = []
 
@@ -80,7 +93,8 @@ def save_sa_outputs(result, parameters: Dict[str, Any], input_file: str | Path) 
 
     run_name = Path(input_file).stem
 
-    run_dir = (Path("output") / "simulated_annealing" / objective_mode / run_name)
+    root = Path("output/multi_truck") if result.final_state.additional_trucks else Path("output")
+    run_dir = root / "simulated_annealing" / objective_mode / run_name
     run_dir.mkdir(parents=True, exist_ok=True)
 
     _remove_obsolete_sa_outputs(run_dir)
@@ -121,11 +135,77 @@ def save_sa_outputs(result, parameters: Dict[str, Any], input_file: str | Path) 
     return run_dir
 
 
+@register_output_saver("genetic_algorithm")
+def save_ga_outputs(result, parameters: Dict[str, Any], input_file: str | Path) -> Path:
+    population_size = result.metadata["population_size"]
+    max_iterations = result.metadata["max_iterations"]
+    root = Path("output/multi_truck") if result.final_state.additional_trucks else Path("output")
+    run_dir = (root / "genetic_algorithm" /
+               f"population_{population_size}_iterations_{max_iterations}" / Path(input_file).stem)
+    run_dir.mkdir(parents=True, exist_ok=True)
+
+    states = {"initial_state": state_to_dict(result.initial_state, calculate_objective(result.initial_state)),
+              "final_state": state_to_dict(result.final_state, calculate_objective(result.final_state))}
+    _write_json(run_dir / "states.json", states)
+    summary = {"algorithm": "genetic_algorithm", "seed": result.metadata["seed"],
+        "configuration": {"population_size": population_size, "max_iterations": max_iterations},
+        "operators": {"selection": "tournament", "tournament_size": min(3, population_size),
+            "crossover": "uniform", "parent_a_probability": 0.5, "mutation_rate": 0.1,
+            "elite_count": 1, "repair": "greedy_bottom_up"},
+        "result": {"initial_objective": result.objective_history[0],
+            "final_objective": result.objective_history[-1],
+            "initial_mean_objective": result.mean_objective_history[0],
+            "final_mean_objective": result.mean_objective_history[-1],
+            "iterations": result.iterations, "duration_seconds": result.duration,
+            "is_valid_final_state": result.metadata["is_valid_final_state"]},
+        "duration_scope": "population initialization and evolution; excludes IO and visualization"}
+    _write_json(run_dir / "summary.json", summary)
+
+    with (run_dir / "history.csv").open("w", newline="", encoding="utf-8") as file:
+        writer = csv.writer(file)
+        writer.writerow(["generation", "max_objective", "mean_objective"])
+        for generation in range(result.iterations + 1):
+            writer.writerow([generation, result.objective_history[generation],
+                             result.mean_objective_history[generation]])
+
+    visualize_state(result.initial_state, title="Initial State (Best Individual)",
+                    output_path=run_dir / "initial_state.png")
+    visualize_state(result.final_state, title="Final State (Best Individual)",
+                    output_path=run_dir / "final_state.png")
+    plot_objective_history(result, output_path=run_dir / "objective_history.png")
+    return run_dir
+
+
 def save_algorithm_outputs(algorithm_name: str, result, parameters: Dict[str, Any],
     input_file: str | Path) -> Path | None:
     saver = OUTPUT_SAVERS.get(algorithm_name)
 
     if saver is None:
+        if result.final_state.additional_trucks and algorithm_name in {
+            "steepest_ascent", "stochastic_hill_climbing", "hill_climbing_sideways", "random_restart_hill_climbing"}:
+            return save_fleet_hc_outputs(algorithm_name, result, parameters, input_file)
         return None
 
     return saver(result, parameters, input_file)
+
+
+def save_fleet_hc_outputs(algorithm_name: str, result, parameters: Dict[str, Any],
+    input_file: str | Path) -> Path:
+    run_dir = Path("output/multi_truck") / algorithm_name / Path(input_file).stem
+    run_dir.mkdir(parents=True, exist_ok=True)
+    _write_json(run_dir / "states.json", {
+        "initial_state": state_to_dict(result.initial_state, calculate_objective(result.initial_state)),
+        "final_state": state_to_dict(result.final_state, calculate_objective(result.final_state))})
+    _write_json(run_dir / "summary.json", {"algorithm": algorithm_name, "parameters": parameters,
+        "truck_count": len(result.final_state.trucks), "metadata": result.metadata,
+        "result": {"initial_objective": calculate_objective(result.initial_state),
+            "final_objective": calculate_objective(result.final_state),
+            "iterations": result.iterations, "duration_seconds": result.duration}})
+    with (run_dir / "history.csv").open("w", newline="", encoding="utf-8") as file:
+        writer = csv.writer(file)
+        writer.writerow(["step", "objective"])
+        writer.writerows(enumerate(result.objective_history))
+    visualize_state(result.initial_state, title="Initial Fleet", output_path=run_dir / "initial_state.png")
+    visualize_state(result.final_state, title="Final Fleet", output_path=run_dir / "final_state.png")
+    plot_objective_history(result, output_path=run_dir / "objective_history.png")
+    return run_dir

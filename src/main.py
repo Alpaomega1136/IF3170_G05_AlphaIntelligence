@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import argparse
-from typing import Any, Dict, Iterable
+from typing import Any, Dict, Iterable, Tuple
 
-from src.core import (Package, Truck, calculate_objective, generate_initial_state, validate_state)
+from src.core import (Package, Truck, calculate_objective, generate_initial_state, get_truck_state, validate_state)
+from src.genetic_algorithm import genetic_algorithm
 from src.hill_climbing import (hill_climbing_sideways, random_restart_hill_climbing,
     steepest_ascent, stochastic_hill_climbing)
 from src.output_manager import save_algorithm_outputs
@@ -18,14 +19,16 @@ ALGORITHM_ALIASES = {"steepest": "steepest_ascent", "steepest_ascent": "steepest
     "random_restart": "random_restart_hill_climbing",
     "random-restart": "random_restart_hill_climbing",
     "random_restart_hill_climbing": "random_restart_hill_climbing", "sa": "simulated_annealing",
-    "simulated_annealing": "simulated_annealing"}
+    "simulated_annealing": "simulated_annealing", "ga": "genetic_algorithm",
+    "genetic_algorithm": "genetic_algorithm"}
 
 ALLOWED_PARAMETERS = {"steepest_ascent": {"seed", "max_iterations", "neighbor_limit"},
     "stochastic_hill_climbing": {"seed", "max_iterations", "neighbor_limit"},
     "hill_climbing_sideways": {"seed", "max_iterations", "neighbor_limit", "max_sideways_moves"},
     "random_restart_hill_climbing": {"seed", "max_restarts", "max_iterations", "neighbor_limit"},
     "simulated_annealing": {"seed", "initial_temperature", "cooling_rate", "min_temperature",
-        "max_iterations", "stuck_threshold", "local_optimum_probe_size", "objective_mode"}}
+        "max_iterations", "stuck_threshold", "local_optimum_probe_size", "objective_mode"},
+    "genetic_algorithm": {"seed", "population_size", "max_iterations"}}
 
 
 def _normalize_algorithm_name(name: str) -> str:
@@ -51,7 +54,7 @@ def _initial_seed(parameters: Dict[str, Any]) -> int | None:
     return seed
 
 
-def run_algorithm(truck: Truck, packages: Iterable[Package], algorithm_name: str,
+def run_algorithm(truck: Truck | Tuple[Truck, ...], packages: Iterable[Package], algorithm_name: str,
     parameters: Dict[str, Any]):
     algorithm_name = _normalize_algorithm_name(algorithm_name)
     _validate_parameters(algorithm_name, parameters)
@@ -62,6 +65,8 @@ def run_algorithm(truck: Truck, packages: Iterable[Package], algorithm_name: str
 
     if algorithm_name == "random_restart_hill_climbing":
         return algorithm_name, random_restart_hill_climbing(truck, package_tuple, **params)
+    if algorithm_name == "genetic_algorithm":
+        return algorithm_name, genetic_algorithm(truck, package_tuple, **params)
 
     initial_state = generate_initial_state(truck, package_tuple, seed=seed)
 
@@ -105,12 +110,21 @@ def print_result(algorithm_name: str, result) -> None:
         elif algorithm_name == "random_restart_hill_climbing":
             print(f"Restart count: {result.metadata['restart_count']}")
             print("Iterations per restart: " f"{result.metadata['iterations_per_restart']}")
+        elif algorithm_name == "genetic_algorithm":
+            print(f"Population size: {result.metadata['population_size']}")
+            print(f"Initial population mean: {result.mean_objective_history[0]:.2f}")
+            print(f"Final population mean: {result.mean_objective_history[-1]:.2f}")
 
     print(f"Iterations: {result.iterations}")
     print(f"Duration: {result.duration:.6f}s")
     if reasons:
         print(f"Invalid reasons: {', '.join(reasons)}")
     print(f"Placed packages: {sorted(result.final_state.placements)}")
+    if result.final_state.additional_trucks:
+        print(f"Truck count: {len(result.final_state.trucks)}")
+        for index in range(len(result.final_state.trucks)):
+            local = get_truck_state(result.final_state, index)
+            print(f"Truck {index + 1}: value={calculate_objective(local)}, packages={sorted(local.placements)}")
 
 
 def main() -> None:
@@ -121,7 +135,8 @@ def main() -> None:
 
     try:
         program_input = load_input(args.input_file)
-        algorithm_name, result = run_algorithm(program_input.truck, program_input.packages,
+        truck = program_input.trucks if program_input.additional_trucks else program_input.truck
+        algorithm_name, result = run_algorithm(truck, program_input.packages,
             program_input.algorithm_name, program_input.parameters)
     except (ValueError, TypeError) as exc:
         parser.error(str(exc))

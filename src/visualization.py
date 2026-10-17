@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
-from src.core import (State, calculate_objective, get_oriented_dimensions, package_map)
+from src.core import (State, calculate_objective, get_oriented_dimensions, get_truck_state, package_map)
 
 
 TRUCK_EDGE_COLOR = "#334155"
@@ -82,15 +82,8 @@ def _package_color_map(state: State):
     return {package_id: cmap(index % cmap.N) for index, package_id in enumerate(sorted_ids)}
 
 
-def visualize_state(state: State, title: str = "Truck State",
-    output_path: Optional[str | Path] = None, show: bool = False) -> None:
-    _ensure_parent(output_path)
-
+def _draw_state(ax, state: State, title: str, color_map, show_outside: bool) -> None:
     packages = package_map(state)
-    color_map = _package_color_map(state)
-
-    fig = plt.figure(figsize=(11, 8))
-    ax = fig.add_subplot(111, projection="3d")
 
     ax.computed_zorder = False
 
@@ -129,8 +122,9 @@ def visualize_state(state: State, title: str = "Truck State",
 
     outside_text = (", ".join(outside_packages) if outside_packages else "None")
 
-    subtitle = (f"Total value: {total_value} | " f"Weight: {total_weight}/"
-        f"{state.truck.max_capacity}\n" f"Outside packages: {outside_text}")
+    subtitle = f"Total value: {total_value} | Weight: {total_weight}/{state.truck.max_capacity}"
+    if show_outside:
+        subtitle += f"\nOutside packages: {outside_text}"
 
     ax.set_title(f"{title}\n{subtitle}", pad=20)
 
@@ -151,7 +145,24 @@ def visualize_state(state: State, title: str = "Truck State",
         ax.legend(handles=legend_handles, title="Packages (w x l x h)", loc="upper left",
             bbox_to_anchor=(1.02, 1.0), borderaxespad=0.0)
 
-    plt.tight_layout()
+def visualize_state(state: State, title: str = "Truck State",
+    output_path: Optional[str | Path] = None, show: bool = False) -> None:
+    _ensure_parent(output_path)
+    fleet = bool(state.additional_trucks)
+    columns = min(2, len(state.trucks))
+    rows = (len(state.trucks) + columns - 1) // columns
+    fig = plt.figure(figsize=(11 * columns, 8 * rows))
+    color_map = _package_color_map(state)
+    for index in range(len(state.trucks)):
+        local = get_truck_state(state, index) if fleet else state
+        ax = fig.add_subplot(rows, columns, index + 1, projection="3d")
+        _draw_state(ax, local, f"Truck {index + 1}" if fleet else title, color_map, not fleet)
+    if fleet:
+        outside = ", ".join(p.id for p in state.packages if p.id not in state.placements) or "None"
+        fig.suptitle(f"{title} | Fleet value: {calculate_objective(state)}\nOutside packages: {outside}", fontsize=14)
+        fig.tight_layout(rect=(0, 0, 1, 0.90))
+    else:
+        fig.tight_layout()
 
     if output_path is not None:
         plt.savefig(output_path, dpi=200, bbox_inches="tight")
@@ -170,17 +181,27 @@ def plot_objective_history(result, output_path: Optional[str | Path] = None, sho
 
     fig, ax = plt.subplots(figsize=(10, 5))
 
-    ax.plot(iterations, result.objective_history, label="Current objective",
-        color=CURRENT_LINE_COLOR, linewidth=1.6)
-
-    ax.plot(iterations, result.best_objective_history, label="Best objective",
-        color=BEST_LINE_COLOR, linewidth=2.0)
-
-    objective_mode = result.metadata.get("objective_mode", "value")
-
-    ax.set_title("Objective Value vs Iteration" f"\nObjective mode: {objective_mode}")
-
-    ax.set_xlabel("Iteration")
+    if result.metadata.get("algorithm") == "genetic_algorithm":
+        ax.plot(iterations, result.objective_history, label="Maximum objective",
+            color=BEST_LINE_COLOR, linewidth=2.0, marker="o", markersize=3)
+        ax.plot(iterations, result.mean_objective_history, label="Mean objective",
+            color=CURRENT_LINE_COLOR, linewidth=1.6, marker="o", markersize=3)
+        ax.set_title("Genetic Algorithm: Population Fitness")
+        ax.set_xlabel("Generation")
+    elif not hasattr(result, "best_objective_history"):
+        label = "Restart" if result.metadata.get("algorithm") == "random_restart_hill_climbing" else "Iteration"
+        ax.plot(iterations, result.objective_history, label="Objective",
+            color=CURRENT_LINE_COLOR, linewidth=1.6, marker="o", markersize=3)
+        ax.set_title(f"Objective Value vs {label}")
+        ax.set_xlabel(label)
+    else:
+        ax.plot(iterations, result.objective_history, label="Current objective",
+            color=CURRENT_LINE_COLOR, linewidth=1.6)
+        ax.plot(iterations, result.best_objective_history, label="Best objective",
+            color=BEST_LINE_COLOR, linewidth=2.0)
+        objective_mode = result.metadata.get("objective_mode", "value")
+        ax.set_title("Objective Value vs Iteration" f"\nObjective mode: {objective_mode}")
+        ax.set_xlabel("Iteration")
     ax.set_ylabel("Objective value")
     ax.grid(True, alpha=0.25)
     ax.legend()
