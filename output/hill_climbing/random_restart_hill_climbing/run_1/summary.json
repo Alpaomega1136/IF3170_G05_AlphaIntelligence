@@ -4,14 +4,13 @@
   "configuration": {
     "max_restarts": 5,
     "max_iterations": 100,
-    "neighbor_limit": 200,
     "seed": 42
   },
   "result": {
     "initial_objective": 570,
     "final_objective": 580,
     "iterations": 5,
-    "duration_seconds": 2.2114990999689326,
+    "duration_seconds": 1.5001925000105985,
     "is_valid_final_state": true
   },
   "duration_scope": "search only; excludes output writing and visualization",

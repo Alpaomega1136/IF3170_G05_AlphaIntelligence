@@ -138,10 +138,10 @@
         "eta": 3,
         "position": {
           "x": 1,
-          "y": 2,
-          "z": 2
+          "y": 1,
+          "z": 0
         },
-        "orientation": "w:y,l:x,h:z"
+        "orientation": "w:x,l:y,h:z"
       },
       {
         "id": "F",
@@ -154,8 +154,8 @@
         "eta": 6,
         "position": {
           "x": 1,
-          "y": 0,
-          "z": 2
+          "y": 6,
+          "z": 0
         },
         "orientation": "w:x,l:y,h:z"
       },
@@ -173,7 +173,7 @@
           "y": 1,
           "z": 1
         },
-        "orientation": "w:y,l:z,h:x"
+        "orientation": "w:z,l:y,h:x"
       },
       {
         "id": "H",
@@ -185,11 +185,11 @@
         "is_fragile": true,
         "eta": 3,
         "position": {
-          "x": 5,
-          "y": 7,
+          "x": 4,
+          "y": 6,
           "z": 0
         },
-        "orientation": "w:x,l:z,h:y"
+        "orientation": "w:x,l:y,h:z"
       },
       {
         "id": "I",
@@ -201,11 +201,11 @@
         "is_fragile": false,
         "eta": 1,
         "position": {
-          "x": 4,
+          "x": 5,
           "y": 0,
           "z": 0
         },
-        "orientation": "w:x,l:y,h:z"
+        "orientation": "w:y,l:x,h:z"
       },
       {
         "id": "J",
@@ -219,7 +219,7 @@
         "position": {
           "x": 0,
           "y": 0,
-          "z": 0
+          "z": 2
         },
         "orientation": "w:y,l:x,h:z"
       }

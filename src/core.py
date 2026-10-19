@@ -36,8 +36,6 @@ ORIENTATION_AXES = {
 AXES_ORIENTATION = {axes: orientation for orientation, axes in ORIENTATION_AXES.items()}
 
 # Data Models
-
-
 @dataclass(frozen=True)
 class Package:
     id: str
@@ -49,14 +47,12 @@ class Package:
     is_fragile: bool
     eta: int
 
-
 @dataclass(frozen=True)
 class Truck:
     width: int
     length: int
     height: int
     max_capacity: int
-
 
 @dataclass(frozen=True)
 class PlacedPackage:
@@ -69,7 +65,6 @@ class PlacedPackage:
     @property
     def position(self) -> Position:
         return (self.x, self.y, self.z)
-
 
 @dataclass
 class State:
@@ -94,7 +89,6 @@ def get_truck_state(state: State, truck_index: int) -> State:
 
 
 # Geometry Helpers
-
 def package_map(state: State) -> Dict[str, Package]:
     return {package.id: package for package in state.packages}
 
@@ -120,11 +114,6 @@ def get_oriented_dimensions(package: Package, orientation: Orientation) -> Dimen
 
 
 def rotate_orientation(orientation: Orientation, axis: str) -> Orientation:
-    """Rotate a package 90 degrees around x, y, or z.
-
-    For rectangular boxes, +90 and -90 have the same resulting dimensions,
-    so each axis simply swaps the two other axes.
-    """
     if orientation not in ORIENTATION_AXES:
         raise ValueError(f"Unknown orientation: {orientation}")
 
@@ -155,7 +144,6 @@ def _bounds(package: Package, placement: PlacedPackage) -> Tuple[int, int, int, 
 def _intervals_overlap(a0: int, a1: int, b0: int, b1: int) -> bool:
     return max(a0, b0) < min(a1, b1)
 
-
 def _xy_overlap(package_a: Package, place_a: PlacedPackage,
                 package_b: Package, place_b: PlacedPackage) -> bool:
     if place_a.truck_index != place_b.truck_index:
@@ -165,7 +153,6 @@ def _xy_overlap(package_a: Package, place_a: PlacedPackage,
     x_overlaps = _intervals_overlap(ax0, ax1, bx0, bx1)
     y_overlaps = _intervals_overlap(ay0, ay1, by0, by1)
     return x_overlaps and y_overlaps
-
 
 def is_overlapping(package_a: Package, place_a: PlacedPackage,
                    package_b: Package, place_b: PlacedPackage) -> bool:
@@ -178,9 +165,7 @@ def is_overlapping(package_a: Package, place_a: PlacedPackage,
     z_overlaps = _intervals_overlap(az0, az1, bz0, bz1)
     return x_overlaps and y_overlaps and z_overlaps
 
-
 # Constraints
-
 def has_support(state: State, package_id: str) -> bool:
     packages = package_map(state)
     if package_id not in packages:
@@ -201,7 +186,6 @@ def has_support(state: State, package_id: str) -> bool:
         if other_top == placement.z and _xy_overlap(package, placement, other, other_place):
             return True
     return False
-
 
 def validate_state(state: State) -> Tuple[bool, List[str]]:
     reasons: List[str] = []
@@ -276,10 +260,7 @@ def is_valid_state(state: State) -> bool:
     valid, _ = validate_state(state)
     return valid
 
-
 # Objective
-
-
 def calculate_objective(state: State) -> int:
     packages = package_map(state)
     total_value = 0
@@ -288,9 +269,7 @@ def calculate_objective(state: State) -> int:
             total_value += packages[package_id].value
     return total_value
 
-
 # State Initialization
-
 def generate_initial_state(
     truck: Truck | Tuple[Truck, ...],
     packages: Iterable[Package],
@@ -348,7 +327,6 @@ def generate_initial_state(
 
     return state
 
-
 def _first_valid_floor_position(state: State, package: Package, orientations: Iterable[Orientation]) -> Optional[State]:
     for orientation in orientations:
         width, length, height = get_oriented_dimensions(package, orientation)
@@ -365,7 +343,6 @@ def _first_valid_floor_position(state: State, package: Package, orientations: It
 
 
 # Neighbor Operations
-
 def swap_packages(state: State, package_id_a: str, package_id_b: str,
                   require_valid: bool = True) -> Optional[State]:
     candidate = state.copy()
@@ -467,6 +444,44 @@ def generate_neighbors(state: State, limit: Optional[int] = 200, seed: Optional[
     return neighbors
 
 
+def generate_all_neighbors(state: State) -> List[State]:
+    neighbors: List[State] = []
+    seen = set()
+    package_ids = [package.id for package in state.packages]
+
+    def add(candidate: Optional[State]) -> None:
+        if candidate is None:
+            return
+        key = _state_key(candidate)
+        if key not in seen:
+            seen.add(key)
+            neighbors.append(candidate)
+
+    for index, package_id_a in enumerate(package_ids):
+        for package_id_b in package_ids[index + 1:]:
+            add(swap_packages(state, package_id_a, package_id_b))
+
+    for package in state.packages:
+        placement = state.placements.get(package.id, PlacedPackage(0, 0, 0))
+        width, length, height = get_oriented_dimensions(package, placement.orientation)
+
+        if package.id in state.placements:
+            add(move_package(state, package.id, None))
+            for orientation in ORIENTATIONS:
+                if orientation != placement.orientation:
+                    add(change_orientation(state, package.id, orientation))
+
+        for truck_index, truck in enumerate(state.trucks):
+            if width > truck.width or length > truck.length or height > truck.height:
+                continue
+            for z in range(truck.height - height + 1):
+                for y in range(truck.length - length + 1):
+                    for x in range(truck.width - width + 1):
+                        add(move_package(state, package.id, (x, y, z), truck_index=truck_index))
+
+    return neighbors
+
+
 def _random_neighbor(state: State, rng: random.Random, max_attempts: int) -> Optional[State]:
     package_ids = []
     for package in state.packages:
@@ -518,7 +533,6 @@ def _random_move(state: State, package_id: str, rng: random.Random) -> Optional[
         ),
         truck_index=truck_index,
     )
-
 
 def _state_key(state: State) -> Tuple[Tuple[str, Tuple[int, int, int, Orientation, int]], ...]:
     key_items = []

@@ -3,7 +3,6 @@
   "seed": 42,
   "configuration": {
     "max_iterations": 100,
-    "neighbor_limit": 200,
     "max_sideways_moves": 10,
     "seed": 42
   },
@@ -11,7 +10,7 @@
     "initial_objective": 530,
     "final_objective": 575,
     "iterations": 11,
-    "duration_seconds": 2.155800200009253,
+    "duration_seconds": 1.2008276000269689,
     "is_valid_final_state": true
   },
   "duration_scope": "search only; excludes output writing and visualization",
