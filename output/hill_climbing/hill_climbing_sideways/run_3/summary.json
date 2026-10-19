@@ -11,7 +11,7 @@
     "initial_objective": 585,
     "final_objective": 590,
     "iterations": 11,
-    "duration_seconds": 4.043304099992383,
+    "duration_seconds": 2.771704599959776,
     "is_valid_final_state": true
   },
   "duration_scope": "search only; excludes output writing and visualization",
