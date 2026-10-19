@@ -1,0 +1,35 @@
+{
+  "algorithm": "simulated_annealing",
+  "objective_mode": "eta_weighted",
+  "seed": 42,
+  "configuration": {
+    "initial_temperature": 100.0,
+    "cooling_rate": 0.99,
+    "min_temperature": 0.001,
+    "max_iterations": 1000,
+    "stuck_threshold": 50,
+    "local_optimum_probe_size": 50
+  },
+  "result": {
+    "initial_objective": 656.4583333333334,
+    "final_objective": 885.3333333333334,
+    "best_objective": 885.3333333333334,
+    "initial_total_value": 550,
+    "final_total_value": 735,
+    "best_total_value": 735,
+    "iterations": 1000,
+    "duration_seconds": 7.753715799888596,
+    "final_temperature": 0.004317124741065788,
+    "stop_reason": "max_iterations"
+  },
+  "sa_statistics": {
+    "accepted_moves": 875,
+    "accepted_worse_moves": 6,
+    "rejected_moves": 125,
+    "stuck_count": 2,
+    "stuck_iterations": [
+      185,
+      591
+    ]
+  }
+}

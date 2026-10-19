@@ -97,10 +97,14 @@ def _remove_obsolete_sa_outputs(run_dir: Path) -> None:
 def save_sa_outputs(result, parameters: Dict[str, Any], input_file: str | Path) -> Path:
     objective_mode = result.metadata["objective_mode"]
 
-    run_name = Path(input_file).stem
+    input_path = Path(input_file)
 
-    root = Path("output/multi_truck") if result.final_state.additional_trucks else Path("output")
-    run_dir = root / "simulated_annealing" / objective_mode / run_name
+    try:
+        relative_path = input_path.relative_to(Path("test") / "simulated_annealing")
+        run_dir = Path("output") / "simulated_annealing" / relative_path.with_suffix("")
+    except ValueError:
+        run_dir = Path("output") / "simulated_annealing" / objective_mode / input_path.stem
+
     run_dir.mkdir(parents=True, exist_ok=True)
 
     _remove_obsolete_sa_outputs(run_dir)
