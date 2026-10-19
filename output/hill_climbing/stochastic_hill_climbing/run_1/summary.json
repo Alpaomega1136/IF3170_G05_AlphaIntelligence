@@ -1,0 +1,17 @@
+{
+  "algorithm": "stochastic_hill_climbing",
+  "seed": 42,
+  "configuration": {
+    "max_iterations": 100,
+    "neighbor_limit": 200,
+    "seed": 42
+  },
+  "result": {
+    "initial_objective": 530,
+    "final_objective": 575,
+    "iterations": 2,
+    "duration_seconds": 1.5578052999917418,
+    "is_valid_final_state": true
+  },
+  "duration_scope": "search only; excludes output writing and visualization"
+}

@@ -1,0 +1,38 @@
+{
+  "algorithm": "random_restart_hill_climbing",
+  "seed": 42,
+  "configuration": {
+    "max_restarts": 5,
+    "max_iterations": 100,
+    "neighbor_limit": 200,
+    "seed": 42
+  },
+  "result": {
+    "initial_objective": 570,
+    "final_objective": 580,
+    "iterations": 5,
+    "duration_seconds": 2.5768164999899454,
+    "is_valid_final_state": true
+  },
+  "duration_scope": "search only; excludes output writing and visualization",
+  "restart_statistics": {
+    "restart_count": 5,
+    "max_restarts": 5,
+    "iterations_per_restart": [
+      2,
+      0,
+      1,
+      0,
+      1,
+      1
+    ],
+    "objectives_per_restart": [
+      560,
+      555,
+      580,
+      575,
+      525,
+      570
+    ]
+  }
+}

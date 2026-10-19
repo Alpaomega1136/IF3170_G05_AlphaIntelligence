@@ -1,7 +1,12 @@
 from __future__ import annotations
 
 import argparse
+from pathlib import Path
+import sys
 from typing import Any, Dict, Iterable, Tuple
+
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from src.core import (Package, Truck, calculate_objective, generate_initial_state, get_truck_state, validate_state)
 from src.genetic_algorithm import genetic_algorithm

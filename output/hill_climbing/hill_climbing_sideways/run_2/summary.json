@@ -1,0 +1,22 @@
+{
+  "algorithm": "hill_climbing_sideways",
+  "seed": 123,
+  "configuration": {
+    "max_iterations": 100,
+    "neighbor_limit": 200,
+    "max_sideways_moves": 10,
+    "seed": 123
+  },
+  "result": {
+    "initial_objective": 525,
+    "final_objective": 565,
+    "iterations": 16,
+    "duration_seconds": 6.065203099977225,
+    "is_valid_final_state": true
+  },
+  "duration_scope": "search only; excludes output writing and visualization",
+  "sideways_statistics": {
+    "sideways_moves": 10,
+    "max_sideways_moves": 10
+  }
+}

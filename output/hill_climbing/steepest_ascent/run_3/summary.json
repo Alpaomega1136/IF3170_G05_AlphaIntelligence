@@ -1,0 +1,17 @@
+{
+  "algorithm": "steepest_ascent",
+  "seed": 999,
+  "configuration": {
+    "max_iterations": 100,
+    "neighbor_limit": 200,
+    "seed": 999
+  },
+  "result": {
+    "initial_objective": 585,
+    "final_objective": 590,
+    "iterations": 1,
+    "duration_seconds": 1.379827100026887,
+    "is_valid_final_state": true
+  },
+  "duration_scope": "search only; excludes output writing and visualization"
+}

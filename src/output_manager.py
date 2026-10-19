@@ -11,6 +11,12 @@ from src.visualization import plot_objective_history, save_sa_visualizations, vi
 
 OutputSaver = Callable[[object, Dict[str, Any], str | Path], Path]
 OUTPUT_SAVERS: Dict[str, OutputSaver] = {}
+HILL_CLIMBING_ALGORITHMS = {
+    "steepest_ascent",
+    "stochastic_hill_climbing",
+    "hill_climbing_sideways",
+    "random_restart_hill_climbing",
+}
 
 
 def register_output_saver(algorithm_name: str):
@@ -176,13 +182,76 @@ def save_ga_outputs(result, parameters: Dict[str, Any], input_file: str | Path) 
     return run_dir
 
 
+def _write_hill_climbing_history(run_dir: Path, algorithm_name: str, result) -> None:
+    with (run_dir / "history.csv").open("w", newline="", encoding="utf-8") as file:
+        writer = csv.writer(file)
+        if algorithm_name == "random_restart_hill_climbing":
+            writer.writerow(["restart", "final_objective", "iterations"])
+            for index, objective in enumerate(result.metadata["objectives_per_restart"]):
+                writer.writerow([index, objective, result.metadata["iterations_per_restart"][index]])
+        else:
+            writer.writerow(["iteration", "objective"])
+            for iteration, objective in enumerate(result.objective_history):
+                writer.writerow([iteration, objective])
+
+
+def save_hill_climbing_outputs(algorithm_name: str, result, parameters: Dict[str, Any],
+    input_file: str | Path) -> Path:
+    root = Path("output/multi_truck") if result.final_state.additional_trucks else Path("output")
+    run_dir = root / "hill_climbing" / algorithm_name / Path(input_file).stem
+    run_dir.mkdir(parents=True, exist_ok=True)
+
+    states = {
+        "initial_state": state_to_dict(result.initial_state, calculate_objective(result.initial_state)),
+        "final_state": state_to_dict(result.final_state, calculate_objective(result.final_state)),
+    }
+    _write_json(run_dir / "states.json", states)
+
+    summary = {
+        "algorithm": algorithm_name,
+        "seed": result.metadata.get("seed"),
+        "configuration": dict(parameters),
+        "result": {
+            "initial_objective": calculate_objective(result.initial_state),
+            "final_objective": calculate_objective(result.final_state),
+            "iterations": result.iterations,
+            "duration_seconds": result.duration,
+            "is_valid_final_state": result.metadata["is_valid_final_state"],
+        },
+        "duration_scope": "search only; excludes output writing and visualization",
+    }
+    if algorithm_name == "hill_climbing_sideways":
+        summary["sideways_statistics"] = {
+            "sideways_moves": result.metadata["sideways_moves"],
+            "max_sideways_moves": result.metadata["max_sideways_moves"],
+        }
+    if algorithm_name == "random_restart_hill_climbing":
+        summary["restart_statistics"] = {
+            "restart_count": result.metadata["restart_count"],
+            "max_restarts": result.metadata["max_restarts"],
+            "iterations_per_restart": result.metadata["iterations_per_restart"],
+            "objectives_per_restart": result.metadata["objectives_per_restart"],
+        }
+    _write_json(run_dir / "summary.json", summary)
+    _write_hill_climbing_history(run_dir, algorithm_name, result)
+
+    visualize_state(result.initial_state, title="Initial State", output_path=run_dir / "initial_state.png")
+    visualize_state(result.final_state, title="Final State", output_path=run_dir / "final_state.png")
+    plot_objective_history(result, output_path=run_dir / "objective_history.png")
+    return run_dir
+
+
+for _algorithm_name in HILL_CLIMBING_ALGORITHMS:
+    OUTPUT_SAVERS[_algorithm_name] = lambda result, parameters, input_file, name=_algorithm_name: (
+        save_hill_climbing_outputs(name, result, parameters, input_file))
+
+
 def save_algorithm_outputs(algorithm_name: str, result, parameters: Dict[str, Any],
     input_file: str | Path) -> Path | None:
     saver = OUTPUT_SAVERS.get(algorithm_name)
 
     if saver is None:
-        if result.final_state.additional_trucks and algorithm_name in {
-            "steepest_ascent", "stochastic_hill_climbing", "hill_climbing_sideways", "random_restart_hill_climbing"}:
+        if result.final_state.additional_trucks and algorithm_name in HILL_CLIMBING_ALGORITHMS:
             return save_fleet_hc_outputs(algorithm_name, result, parameters, input_file)
         return None
 
