@@ -5,22 +5,64 @@
     "population_size": 20,
     "max_iterations": 50
   },
+  "representation": {
+    "type": "fixed_width_decimal_string",
+    "alphabet": "0123456789",
+    "gene_fields": [
+      "truck_code",
+      "x",
+      "y",
+      "z",
+      "orientation"
+    ],
+    "field_widths": [
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "package_order": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E",
+      "F",
+      "G",
+      "H",
+      "I",
+      "J",
+      "K",
+      "L"
+    ],
+    "orientation_order": [
+      "w:x,l:y,h:z",
+      "w:x,l:z,h:y",
+      "w:y,l:x,h:z",
+      "w:z,l:x,h:y",
+      "w:y,l:z,h:x",
+      "w:z,l:y,h:x"
+    ],
+    "outside_truck_code": 0
+  },
   "operators": {
-    "selection": "tournament",
-    "tournament_size": 3,
-    "crossover": "uniform",
-    "parent_a_probability": 0.5,
+    "selection": "roulette_wheel",
+    "crossover": "one_point",
+    "crossover_boundary": "variable",
+    "mutation": "single_variable",
+    "orientation_mutation": "rotate_90_degrees",
     "mutation_rate": 0.1,
-    "elite_count": 1,
+    "elite_count": 0,
     "repair": "greedy_bottom_up"
   },
   "result": {
     "initial_objective": 575,
-    "final_objective": 575,
+    "final_objective": 435,
     "initial_mean_objective": 542.5,
-    "final_mean_objective": 570.5,
+    "final_mean_objective": 413.0,
     "iterations": 50,
-    "duration_seconds": 5.028501599910669,
+    "duration_seconds": 5.652280700043775,
     "is_valid_final_state": true
   },
   "duration_scope": "population initialization and evolution; excludes IO and visualization"

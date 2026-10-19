@@ -152,12 +152,16 @@ def save_ga_outputs(result, parameters: Dict[str, Any], input_file: str | Path) 
 
     states = {"initial_state": state_to_dict(result.initial_state, calculate_objective(result.initial_state)),
               "final_state": state_to_dict(result.final_state, calculate_objective(result.final_state))}
+    states["initial_state"]["chromosome"] = result.metadata["initial_chromosome"]
+    states["final_state"]["chromosome"] = result.metadata["final_chromosome"]
     _write_json(run_dir / "states.json", states)
     summary = {"algorithm": "genetic_algorithm", "seed": result.metadata["seed"],
         "configuration": {"population_size": population_size, "max_iterations": max_iterations},
-        "operators": {"selection": "tournament", "tournament_size": min(3, population_size),
-            "crossover": "uniform", "parent_a_probability": 0.5, "mutation_rate": 0.1,
-            "elite_count": 1, "repair": "greedy_bottom_up"},
+        "representation": {"type": result.metadata["representation"], "alphabet": "0123456789",
+            "gene_fields": result.metadata["gene_fields"], "field_widths": result.metadata["field_widths"],
+            "package_order": result.metadata["package_order"],
+            "orientation_order": result.metadata["orientation_order"], "outside_truck_code": 0},
+        "operators": result.metadata["operators"],
         "result": {"initial_objective": result.objective_history[0],
             "final_objective": result.objective_history[-1],
             "initial_mean_objective": result.mean_objective_history[0],

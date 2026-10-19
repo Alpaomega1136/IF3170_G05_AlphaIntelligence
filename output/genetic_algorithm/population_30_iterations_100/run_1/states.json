@@ -129,7 +129,8 @@
       "F",
       "J",
       "K"
-    ]
+    ],
+    "chromosome": "113200000015103000001413400000104011613211103000000000012034"
   },
   "final_state": {
     "truck": {
@@ -138,57 +139,57 @@
       "height": 5,
       "max_capacity": 40
     },
-    "objective_score": 590,
-    "total_value": 590,
-    "total_weight": 40,
+    "objective_score": 495,
+    "total_value": 495,
+    "total_weight": 35,
     "inside_packages": [
       {
-        "id": "A",
+        "id": "B",
         "width": 4,
-        "length": 4,
+        "length": 3,
         "height": 2,
-        "value": 140,
-        "weight": 10,
+        "value": 120,
+        "weight": 9,
         "is_fragile": false,
-        "eta": 3,
+        "eta": 2,
         "position": {
-          "x": 1,
-          "y": 3,
-          "z": 2
+          "x": 0,
+          "y": 5,
+          "z": 0
+        },
+        "orientation": "w:z,l:y,h:x"
+      },
+      {
+        "id": "D",
+        "width": 5,
+        "length": 3,
+        "height": 2,
+        "value": 160,
+        "weight": 12,
+        "is_fragile": false,
+        "eta": 1,
+        "position": {
+          "x": 3,
+          "y": 5,
+          "z": 0
         },
         "orientation": "w:x,l:y,h:z"
       },
       {
-        "id": "C",
+        "id": "F",
         "width": 3,
-        "length": 3,
-        "height": 2,
-        "value": 95,
-        "weight": 7,
-        "is_fragile": false,
-        "eta": 5,
-        "position": {
-          "x": 5,
-          "y": 1,
-          "z": 0
-        },
-        "orientation": "w:z,l:x,h:y"
-      },
-      {
-        "id": "E",
-        "width": 2,
         "length": 2,
         "height": 2,
-        "value": 70,
-        "weight": 5,
-        "is_fragile": true,
-        "eta": 4,
+        "value": 85,
+        "weight": 6,
+        "is_fragile": false,
+        "eta": 6,
         "position": {
           "x": 4,
-          "y": 1,
-          "z": 3
+          "y": 2,
+          "z": 0
         },
-        "orientation": "w:y,l:z,h:x"
+        "orientation": "w:x,l:y,h:z"
       },
       {
         "id": "G",
@@ -200,11 +201,11 @@
         "is_fragile": false,
         "eta": 2,
         "position": {
-          "x": 0,
-          "y": 4,
+          "x": 1,
+          "y": 2,
           "z": 0
         },
-        "orientation": "w:x,l:z,h:y"
+        "orientation": "w:z,l:x,h:y"
       },
       {
         "id": "H",
@@ -216,51 +217,22 @@
         "is_fragile": true,
         "eta": 3,
         "position": {
-          "x": 6,
-          "y": 1,
-          "z": 3
-        },
-        "orientation": "w:y,l:x,h:z"
-      },
-      {
-        "id": "I",
-        "width": 3,
-        "length": 3,
-        "height": 1,
-        "value": 90,
-        "weight": 6,
-        "is_fragile": false,
-        "eta": 1,
-        "position": {
-          "x": 1,
-          "y": 1,
+          "x": 3,
+          "y": 2,
           "z": 0
-        },
-        "orientation": "w:z,l:x,h:y"
-      },
-      {
-        "id": "L",
-        "width": 3,
-        "length": 2,
-        "height": 1,
-        "value": 65,
-        "weight": 4,
-        "is_fragile": false,
-        "eta": 7,
-        "position": {
-          "x": 2,
-          "y": 0,
-          "z": 3
         },
         "orientation": "w:y,l:z,h:x"
       }
     ],
     "outside_packages": [
-      "B",
-      "D",
-      "F",
+      "A",
+      "C",
+      "E",
+      "I",
       "J",
-      "K"
-    ]
+      "K",
+      "L"
+    ],
+    "chromosome": "023001050500030135000060014200112031320402310024050410003402"
   }
 }

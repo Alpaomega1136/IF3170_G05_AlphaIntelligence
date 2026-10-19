@@ -129,7 +129,8 @@
       "D",
       "F",
       "I"
-    ]
+    ],
+    "chromosome": "000000000012001000001430500000106031012500000122051032110204"
   },
   "final_state": {
     "truck": {
@@ -138,73 +139,41 @@
       "height": 5,
       "max_capacity": 40
     },
-    "objective_score": 580,
-    "total_value": 580,
-    "total_weight": 40,
+    "objective_score": 425,
+    "total_value": 425,
+    "total_weight": 30,
     "inside_packages": [
       {
-        "id": "A",
+        "id": "B",
         "width": 4,
-        "length": 4,
-        "height": 2,
-        "value": 140,
-        "weight": 10,
-        "is_fragile": false,
-        "eta": 3,
-        "position": {
-          "x": 2,
-          "y": 2,
-          "z": 0
-        },
-        "orientation": "w:z,l:y,h:x"
-      },
-      {
-        "id": "C",
-        "width": 3,
         "length": 3,
         "height": 2,
-        "value": 95,
-        "weight": 7,
-        "is_fragile": false,
-        "eta": 5,
-        "position": {
-          "x": 2,
-          "y": 0,
-          "z": 0
-        },
-        "orientation": "w:x,l:z,h:y"
-      },
-      {
-        "id": "E",
-        "width": 2,
-        "length": 2,
-        "height": 2,
-        "value": 70,
-        "weight": 5,
-        "is_fragile": true,
-        "eta": 4,
-        "position": {
-          "x": 4,
-          "y": 3,
-          "z": 0
-        },
-        "orientation": "w:z,l:y,h:x"
-      },
-      {
-        "id": "G",
-        "width": 4,
-        "length": 2,
-        "height": 1,
-        "value": 75,
-        "weight": 5,
+        "value": 120,
+        "weight": 9,
         "is_fragile": false,
         "eta": 2,
         "position": {
-          "x": 0,
-          "y": 6,
+          "x": 4,
+          "y": 4,
           "z": 0
         },
         "orientation": "w:z,l:x,h:y"
+      },
+      {
+        "id": "D",
+        "width": 5,
+        "length": 3,
+        "height": 2,
+        "value": 160,
+        "weight": 12,
+        "is_fragile": false,
+        "eta": 1,
+        "position": {
+          "x": 3,
+          "y": 1,
+          "z": 0
+        },
+        "orientation": "w:x,l:z,h:y"
       },
       {
         "id": "H",
@@ -216,51 +185,39 @@
         "is_fragile": true,
         "eta": 3,
         "position": {
-          "x": 0,
-          "y": 1,
-          "z": 2
-        },
-        "orientation": "w:z,l:y,h:x"
-      },
-      {
-        "id": "K",
-        "width": 2,
-        "length": 3,
-        "height": 2,
-        "value": 80,
-        "weight": 6,
-        "is_fragile": false,
-        "eta": 4,
-        "position": {
-          "x": 0,
-          "y": 3,
-          "z": 2
+          "x": 2,
+          "y": 5,
+          "z": 0
         },
         "orientation": "w:x,l:z,h:y"
       },
       {
-        "id": "L",
+        "id": "I",
         "width": 3,
-        "length": 2,
+        "length": 3,
         "height": 1,
-        "value": 65,
-        "weight": 4,
+        "value": 90,
+        "weight": 6,
         "is_fragile": false,
-        "eta": 7,
+        "eta": 1,
         "position": {
           "x": 0,
-          "y": 2,
+          "y": 5,
           "z": 0
         },
         "orientation": "w:y,l:z,h:x"
       }
     ],
     "outside_packages": [
-      "B",
-      "D",
+      "A",
+      "C",
+      "E",
       "F",
-      "I",
-      "J"
-    ]
+      "G",
+      "J",
+      "K",
+      "L"
+    ],
+    "chromosome": "000021440300020131010020307502030101250110504000050450200703"
   }
 }
