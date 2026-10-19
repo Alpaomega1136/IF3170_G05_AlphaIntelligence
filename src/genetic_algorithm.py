@@ -20,11 +20,17 @@ from src.core import (
 )
 
 
+# Acuan GA dasar: materi kuliah IF3170 Materi 02, hlm. 43-49 (string, seleksi,
+# crossover, mutasi, dan pergantian populasi). Adaptasi kontainer di bawah
+# dirancang sendiri, tidak diambil dari referensi internet tertentu.
+# Nilai 0.1 adalah pilihan konfigurasi, materi kuliah hanya menyebut peluang kecil.
 MUTATION_RATE = 0.1
 
 
 @dataclass(frozen=True)
 class ChromosomeCodec:
+    # Adaptasi string materi kuliah: lima field per paket, termasuk kode truk untuk
+    # bonus multi-truck. Padding nol menjaga field berdomain > 9 tetap utuh.
     trucks: Tuple[Truck, ...]
     packages: Tuple[Package, ...]
 
@@ -105,6 +111,8 @@ def initialize_population(
     if isinstance(population_size, bool) or not isinstance(population_size, int) or population_size < 2:
         raise ValueError("population_size must be an integer >= 2")
 
+    # Adaptasi inisialisasi: bangkitkan State acak yang valid sebelum encoding
+    # agar seluruh individu awal memenuhi constraints kontainer.
     return [codec.encode(generate_initial_state(codec.trucks, codec.packages,
             seed=rng.randrange(1_000_000_000))) for _ in range(population_size)]
 
@@ -132,11 +140,16 @@ def roulette_wheel_selection(population: List[str], fitness_scores: List[int], r
     if any(score < 0 for score in fitness_scores):
         raise ValueError("fitness scores must be non-negative")
     if not any(fitness_scores):
+        # Penanganan kasus khusus: seleksi seragam saat normalisasi fitness
+        # tidak terdefinisi karena seluruh nilainya nol.
         return rng.choice(population)
     return rng.choices(population, weights=fitness_scores, k=1)[0]
 
 
 def repair_state(state: State) -> State:
+    # Heuristik buatan sendiri, di luar pseudocode GA materi kuliah, diizinkan oleh
+    # spesifikasi hlm. 13: susun dari bawah, prioritaskan value pada z yang sama,
+    # lalu coba reinserasi paket aktif yang ditolak. Fitness tetap total value.
     child = State(state.truck, state.packages, {}, state.additional_trucks)
     packages = {package.id: package for package in state.packages}
     selected = [(package.id, state.placements[package.id]) for package in state.packages
@@ -156,6 +169,9 @@ def repair_state(state: State) -> State:
 
 
 def _reinsert_package(state: State, package: Package, preferred: PlacedPackage) -> State:
+    # Heuristik posisi buatan sendiri: coba truk asal lalu truk lain, dengan
+    # kandidat posisi lama, titik asal, dan sisi positif paket yang telah dimuat.
+    # Orientasi dipertahankan; setiap kandidat tetap melewati validator lengkap.
     packages = {item.id: item for item in state.packages}
     width, length, height = get_oriented_dimensions(package, preferred.orientation)
     for truck_index in sorted(range(len(state.trucks)), key=lambda index: index != preferred.truck_index):
@@ -194,7 +210,8 @@ def repair_chromosome(chromosome: str, codec: ChromosomeCodec) -> str:
         if package.id in repaired.placements:
             gene = encoded[start:start + gene_width]
         else:
-            # Preserve candidate coordinates/orientation so later mutations can activate them.
+            # Adaptasi repair: pertahankan koordinat/orientasi kandidat di string
+            # agar mutasi berikutnya dapat mengaktifkan paket dengan kode truk baru.
             gene = "0" * widths[0] + gene[widths[0]:]
         genes.append(gene)
     return "".join(genes)
@@ -205,7 +222,8 @@ def one_point_crossover(parent_a: str, parent_b: str, codec: ChromosomeCodec, rn
         raise ValueError("parents must have the expected chromosome length")
     if len(codec.packages) < 2:
         return parent_a
-    # Inherit each package's truck, position, and orientation from the same parent.
+    # Adaptasi one-point crossover materi kuliah: potong hanya antarblok paket agar
+    # kode truk, koordinat, dan orientasi satu paket berasal dari orang tua sama.
     cut = rng.randrange(1, len(codec.packages)) * sum(codec.field_widths)
     return parent_a[:cut] + parent_b[cut:]
 
@@ -215,11 +233,14 @@ def mutate(chromosome: str, codec: ChromosomeCodec, rng: random.Random) -> str:
         return chromosome
     widths = codec.field_widths * len(codec.packages)
     limits = codec.field_limits * len(codec.packages)
+    # Adaptasi mutasi materi kuliah: ubah satu field utuh, bukan digit di tengah
+    # field beberapa digit; field dengan domain tunggal tidak dipilih.
     index = rng.choice([i for i, limit in enumerate(limits) if limit > 1])
     start = sum(widths[:index])
     end = start + widths[index]
     old_value = int(chromosome[start:end])
     if index % len(codec.field_widths) == 4:
+        # Adaptasi orientasi mengikuti rotasi 90 derajat pada spesifikasi hlm. 9.
         orientation = rotate_orientation(ORIENTATIONS[old_value], rng.choice(("x", "y", "z")))
         new_value = ORIENTATIONS.index(orientation)
     else:
