@@ -27,10 +27,10 @@ ALGORITHM_ALIASES = {"steepest": "steepest_ascent", "steepest_ascent": "steepest
     "simulated_annealing": "simulated_annealing", "ga": "genetic_algorithm",
     "genetic_algorithm": "genetic_algorithm"}
 
-ALLOWED_PARAMETERS = {"steepest_ascent": {"seed", "max_iterations", "neighbor_limit"},
-    "stochastic_hill_climbing": {"seed", "max_iterations", "neighbor_limit"},
-    "hill_climbing_sideways": {"seed", "max_iterations", "neighbor_limit", "max_sideways_moves"},
-    "random_restart_hill_climbing": {"seed", "max_restarts", "max_iterations", "neighbor_limit"},
+ALLOWED_PARAMETERS = {"steepest_ascent": {"seed", "max_iterations"},
+    "stochastic_hill_climbing": {"seed", "max_iterations"},
+    "hill_climbing_sideways": {"seed", "max_iterations", "max_sideways_moves"},
+    "random_restart_hill_climbing": {"seed", "max_restarts", "max_iterations"},
     "simulated_annealing": {"seed", "initial_temperature", "cooling_rate", "min_temperature",
         "max_iterations", "stuck_threshold", "local_optimum_probe_size", "objective_mode"},
     "genetic_algorithm": {"seed", "population_size", "max_iterations"}}

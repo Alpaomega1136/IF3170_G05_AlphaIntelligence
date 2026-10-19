@@ -133,7 +133,6 @@
     "name": "stochastic_hill_climbing",
     "parameters": {
       "max_iterations": 100,
-      "neighbor_limit": 200,
       "seed": 123
     }
   }

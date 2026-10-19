@@ -3,15 +3,14 @@
   "seed": 123,
   "configuration": {
     "max_iterations": 100,
-    "neighbor_limit": 200,
     "max_sideways_moves": 10,
     "seed": 123
   },
   "result": {
     "initial_objective": 525,
-    "final_objective": 565,
-    "iterations": 16,
-    "duration_seconds": 2.0862596000079066,
+    "final_objective": 560,
+    "iterations": 12,
+    "duration_seconds": 0.9361616999958642,
     "is_valid_final_state": true
   },
   "duration_scope": "search only; excludes output writing and visualization",

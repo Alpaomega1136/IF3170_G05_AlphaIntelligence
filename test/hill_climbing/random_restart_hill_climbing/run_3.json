@@ -134,7 +134,6 @@
     "parameters": {
       "max_restarts": 5,
       "max_iterations": 100,
-      "neighbor_limit": 200,
       "seed": 999
     }
   }

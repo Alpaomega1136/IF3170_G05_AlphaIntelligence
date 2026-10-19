@@ -133,7 +133,6 @@
     "name": "steepest_ascent",
     "parameters": {
       "max_iterations": 100,
-      "neighbor_limit": 200,
       "seed": 42
     }
   }

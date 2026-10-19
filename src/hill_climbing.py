@@ -10,8 +10,9 @@ from src.core import (
     State,
     Truck,
     calculate_objective,
+    generate_all_neighbors,
     generate_initial_state,
-    generate_neighbors,
+    generate_neighbor,
     is_valid_state,
 )
 
@@ -29,17 +30,14 @@ class SearchResult:
 def steepest_ascent(
     initial_state: State,
     max_iterations: int = 100,
-    neighbor_limit: int = 200,
     seed: Optional[int] = None,
 ) -> SearchResult:
     start = time.perf_counter()
-    rng = random.Random(seed)
     current = initial_state.copy()
     history = [calculate_objective(current)]
 
     for _ in range(max_iterations):
-        neighbor_seed = rng.randrange(1_000_000_000)
-        neighbors = generate_neighbors(current, limit=neighbor_limit, seed=neighbor_seed)
+        neighbors = generate_all_neighbors(current)
         if not neighbors:
             break
 
@@ -72,7 +70,6 @@ def steepest_ascent(
 def stochastic_hill_climbing(
     initial_state: State,
     max_iterations: int = 100,
-    neighbor_limit: int = 200,
     seed: Optional[int] = None,
 ) -> SearchResult:
     start = time.perf_counter()
@@ -82,17 +79,11 @@ def stochastic_hill_climbing(
 
     for _ in range(max_iterations):
         neighbor_seed = rng.randrange(1_000_000_000)
-        neighbors = generate_neighbors(current, limit=neighbor_limit, seed=neighbor_seed)
-        improving = []
-
-        for neighbor in neighbors:
-            if calculate_objective(neighbor) > history[-1]:
-                improving.append(neighbor)
-
-        if not improving:
+        neighbor = generate_neighbor(current, seed=neighbor_seed)
+        if neighbor is None:
             break
-
-        current = rng.choice(improving)
+        if calculate_objective(neighbor) > calculate_objective(current):
+            current = neighbor
         history.append(calculate_objective(current))
 
     return _result(
@@ -109,7 +100,6 @@ def stochastic_hill_climbing(
 def hill_climbing_sideways(
     initial_state: State,
     max_iterations: int = 100,
-    neighbor_limit: int = 200,
     max_sideways_moves: int = 10,
     seed: Optional[int] = None,
 ) -> SearchResult:
@@ -120,8 +110,7 @@ def hill_climbing_sideways(
     sideways_moves = 0
 
     for _ in range(max_iterations):
-        neighbor_seed = rng.randrange(1_000_000_000)
-        neighbors = generate_neighbors(current, limit=neighbor_limit, seed=neighbor_seed)
+        neighbors = generate_all_neighbors(current)
         if not neighbors:
             break
 
@@ -169,7 +158,6 @@ def random_restart_hill_climbing(
     packages: Iterable[Package],
     max_restarts: int = 5,
     max_iterations: int = 100,
-    neighbor_limit: int = 200,
     seed: Optional[int] = None,
 ) -> SearchResult:
     start = time.perf_counter()
@@ -186,7 +174,6 @@ def random_restart_hill_climbing(
         result = steepest_ascent(
             initial,
             max_iterations=max_iterations,
-            neighbor_limit=neighbor_limit,
             seed=search_seed,
         )
         iterations_per_restart.append(result.iterations)

@@ -133,7 +133,6 @@
     "name": "hill_climbing_sideways",
     "parameters": {
       "max_iterations": 100,
-      "neighbor_limit": 200,
       "max_sideways_moves": 10,
       "seed": 42
     }
