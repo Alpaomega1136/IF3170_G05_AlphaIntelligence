@@ -1,0 +1,73 @@
+{
+  "algorithm": "genetic_algorithm",
+  "seed": 123,
+  "configuration": {
+    "population_size": 20,
+    "max_iterations": 100
+  },
+  "representation": {
+    "type": "fixed_width_decimal_string",
+    "alphabet": "0123456789",
+    "gene_fields": [
+      "truck_code",
+      "x",
+      "y",
+      "z",
+      "orientation"
+    ],
+    "field_widths": [
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "package_order": [
+      "P01",
+      "P02",
+      "P03",
+      "P04",
+      "P05",
+      "P06",
+      "P07",
+      "P08",
+      "P09",
+      "P10",
+      "P11",
+      "P12",
+      "P13",
+      "P14"
+    ],
+    "orientation_order": [
+      "w:x,l:y,h:z",
+      "w:x,l:z,h:y",
+      "w:y,l:x,h:z",
+      "w:z,l:x,h:y",
+      "w:y,l:z,h:x",
+      "w:z,l:y,h:x"
+    ],
+    "outside_truck_code": 0
+  },
+  "operators": {
+    "selection": "roulette_wheel",
+    "crossover": "one_point",
+    "crossover_boundary": "package",
+    "mutation": "single_variable",
+    "orientation_mutation": "rotate_90_degrees",
+    "mutation_rate": 0.1,
+    "elite_count": 0,
+    "repair": "bottom_up_reinsertion",
+    "repair_priority": "value_descending",
+    "repair_positions": "package_faces"
+  },
+  "result": {
+    "initial_objective": 620,
+    "final_objective": 670,
+    "initial_mean_objective": 426.25,
+    "final_mean_objective": 670.0,
+    "iterations": 100,
+    "duration_seconds": 3.8702694000094198,
+    "is_valid_final_state": true
+  },
+  "duration_scope": "population initialization and evolution; excludes IO and visualization"
+}

@@ -1,0 +1,168 @@
+{
+  "problem": {
+    "trucks": [
+      {
+        "width": 4,
+        "length": 4,
+        "height": 3,
+        "max_capacity": 18
+      },
+      {
+        "width": 4,
+        "length": 4,
+        "height": 3,
+        "max_capacity": 18
+      }
+    ],
+    "packages": [
+      {
+        "id": "P01",
+        "width": 4,
+        "length": 2,
+        "height": 1,
+        "value": 50,
+        "weight": 2,
+        "is_fragile": false,
+        "eta": 2
+      },
+      {
+        "id": "P02",
+        "width": 1,
+        "length": 3,
+        "height": 2,
+        "value": 20,
+        "weight": 7,
+        "is_fragile": false,
+        "eta": 7
+      },
+      {
+        "id": "P03",
+        "width": 2,
+        "length": 3,
+        "height": 1,
+        "value": 85,
+        "weight": 4,
+        "is_fragile": false,
+        "eta": 3
+      },
+      {
+        "id": "P04",
+        "width": 4,
+        "length": 2,
+        "height": 1,
+        "value": 50,
+        "weight": 4,
+        "is_fragile": false,
+        "eta": 5
+      },
+      {
+        "id": "P05",
+        "width": 2,
+        "length": 1,
+        "height": 1,
+        "value": 160,
+        "weight": 9,
+        "is_fragile": false,
+        "eta": 2
+      },
+      {
+        "id": "P06",
+        "width": 4,
+        "length": 2,
+        "height": 2,
+        "value": 120,
+        "weight": 8,
+        "is_fragile": false,
+        "eta": 5
+      },
+      {
+        "id": "P07",
+        "width": 3,
+        "length": 2,
+        "height": 2,
+        "value": 35,
+        "weight": 5,
+        "is_fragile": false,
+        "eta": 4
+      },
+      {
+        "id": "P08",
+        "width": 1,
+        "length": 1,
+        "height": 2,
+        "value": 105,
+        "weight": 7,
+        "is_fragile": false,
+        "eta": 7
+      },
+      {
+        "id": "P09",
+        "width": 4,
+        "length": 2,
+        "height": 1,
+        "value": 30,
+        "weight": 3,
+        "is_fragile": true,
+        "eta": 7
+      },
+      {
+        "id": "P10",
+        "width": 3,
+        "length": 1,
+        "height": 1,
+        "value": 65,
+        "weight": 2,
+        "is_fragile": false,
+        "eta": 7
+      },
+      {
+        "id": "P11",
+        "width": 4,
+        "length": 3,
+        "height": 2,
+        "value": 95,
+        "weight": 6,
+        "is_fragile": false,
+        "eta": 2
+      },
+      {
+        "id": "P12",
+        "width": 2,
+        "length": 2,
+        "height": 1,
+        "value": 150,
+        "weight": 3,
+        "is_fragile": true,
+        "eta": 8
+      },
+      {
+        "id": "P13",
+        "width": 2,
+        "length": 1,
+        "height": 2,
+        "value": 85,
+        "weight": 4,
+        "is_fragile": false,
+        "eta": 5
+      },
+      {
+        "id": "P14",
+        "width": 4,
+        "length": 3,
+        "height": 2,
+        "value": 35,
+        "weight": 7,
+        "is_fragile": false,
+        "eta": 3
+      }
+    ]
+  },
+  "algorithm": {
+    "name": "genetic_algorithm",
+    "parameters": {
+      "population_size": 20,
+      "max_iterations": 100,
+      "seed": 123
+    }
+  }
+}

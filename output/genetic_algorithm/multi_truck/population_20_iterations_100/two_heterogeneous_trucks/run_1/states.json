@@ -1,0 +1,282 @@
+{
+  "initial_state": {
+    "trucks": [
+      {
+        "truck": {
+          "width": 3,
+          "length": 6,
+          "height": 3,
+          "max_capacity": 12
+        },
+        "total_value": 185,
+        "total_weight": 11,
+        "inside_packages": [
+          {
+            "id": "P06",
+            "width": 2,
+            "length": 2,
+            "height": 2,
+            "value": 125,
+            "weight": 7,
+            "is_fragile": true,
+            "eta": 8,
+            "position": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "orientation": "w:y,l:x,h:z"
+          },
+          {
+            "id": "P07",
+            "width": 3,
+            "length": 2,
+            "height": 1,
+            "value": 60,
+            "weight": 4,
+            "is_fragile": false,
+            "eta": 5,
+            "position": {
+              "x": 1,
+              "y": 2,
+              "z": 0
+            },
+            "orientation": "w:z,l:x,h:y"
+          }
+        ],
+        "truck_index": 0
+      },
+      {
+        "truck": {
+          "width": 5,
+          "length": 3,
+          "height": 4,
+          "max_capacity": 20
+        },
+        "total_value": 395,
+        "total_weight": 20,
+        "inside_packages": [
+          {
+            "id": "P02",
+            "width": 2,
+            "length": 1,
+            "height": 2,
+            "value": 45,
+            "weight": 2,
+            "is_fragile": true,
+            "eta": 1,
+            "position": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "orientation": "w:y,l:x,h:z"
+          },
+          {
+            "id": "P03",
+            "width": 4,
+            "length": 1,
+            "height": 1,
+            "value": 125,
+            "weight": 9,
+            "is_fragile": true,
+            "eta": 2,
+            "position": {
+              "x": 4,
+              "y": 2,
+              "z": 0
+            },
+            "orientation": "w:z,l:x,h:y"
+          },
+          {
+            "id": "P09",
+            "width": 3,
+            "length": 1,
+            "height": 1,
+            "value": 105,
+            "weight": 3,
+            "is_fragile": false,
+            "eta": 5,
+            "position": {
+              "x": 4,
+              "y": 0,
+              "z": 0
+            },
+            "orientation": "w:z,l:x,h:y"
+          },
+          {
+            "id": "P12",
+            "width": 2,
+            "length": 1,
+            "height": 2,
+            "value": 120,
+            "weight": 6,
+            "is_fragile": true,
+            "eta": 8,
+            "position": {
+              "x": 1,
+              "y": 2,
+              "z": 0
+            },
+            "orientation": "w:x,l:y,h:z"
+          }
+        ],
+        "truck_index": 1
+      }
+    ],
+    "objective_score": 580,
+    "total_value": 580,
+    "total_weight": 31,
+    "outside_packages": [
+      "P01",
+      "P04",
+      "P05",
+      "P08",
+      "P10",
+      "P11",
+      "P13",
+      "P14"
+    ],
+    "chromosome": "0000021002242030000000000100021120300000240030000000000212000000000000"
+  },
+  "final_state": {
+    "trucks": [
+      {
+        "truck": {
+          "width": 3,
+          "length": 6,
+          "height": 3,
+          "max_capacity": 12
+        },
+        "total_value": 295,
+        "total_weight": 12,
+        "inside_packages": [
+          {
+            "id": "P12",
+            "width": 2,
+            "length": 1,
+            "height": 2,
+            "value": 120,
+            "weight": 6,
+            "is_fragile": true,
+            "eta": 8,
+            "position": {
+              "x": 2,
+              "y": 3,
+              "z": 0
+            },
+            "orientation": "w:z,l:x,h:y"
+          },
+          {
+            "id": "P14",
+            "width": 1,
+            "length": 3,
+            "height": 2,
+            "value": 175,
+            "weight": 6,
+            "is_fragile": false,
+            "eta": 5,
+            "position": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "orientation": "w:z,l:y,h:x"
+          }
+        ],
+        "truck_index": 0
+      },
+      {
+        "truck": {
+          "width": 5,
+          "length": 3,
+          "height": 4,
+          "max_capacity": 20
+        },
+        "total_value": 335,
+        "total_weight": 18,
+        "inside_packages": [
+          {
+            "id": "P02",
+            "width": 2,
+            "length": 1,
+            "height": 2,
+            "value": 45,
+            "weight": 2,
+            "is_fragile": true,
+            "eta": 1,
+            "position": {
+              "x": 2,
+              "y": 0,
+              "z": 0
+            },
+            "orientation": "w:y,l:x,h:z"
+          },
+          {
+            "id": "P03",
+            "width": 4,
+            "length": 1,
+            "height": 1,
+            "value": 125,
+            "weight": 9,
+            "is_fragile": true,
+            "eta": 2,
+            "position": {
+              "x": 3,
+              "y": 0,
+              "z": 0
+            },
+            "orientation": "w:z,l:x,h:y"
+          },
+          {
+            "id": "P07",
+            "width": 3,
+            "length": 2,
+            "height": 1,
+            "value": 60,
+            "weight": 4,
+            "is_fragile": false,
+            "eta": 5,
+            "position": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "orientation": "w:y,l:x,h:z"
+          },
+          {
+            "id": "P09",
+            "width": 3,
+            "length": 1,
+            "height": 1,
+            "value": 105,
+            "weight": 3,
+            "is_fragile": false,
+            "eta": 5,
+            "position": {
+              "x": 4,
+              "y": 0,
+              "z": 0
+            },
+            "orientation": "w:z,l:x,h:y"
+          }
+        ],
+        "truck_index": 1
+      }
+    ],
+    "objective_score": 630,
+    "total_value": 630,
+    "total_weight": 30,
+    "outside_packages": [
+      "P01",
+      "P04",
+      "P05",
+      "P06",
+      "P08",
+      "P10",
+      "P11",
+      "P13"
+    ],
+    "chromosome": "0000022002230030440300100000002000202005240030000500035123030003010005"
+  }
+}
