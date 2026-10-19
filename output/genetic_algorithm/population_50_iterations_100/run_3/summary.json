@@ -49,20 +49,22 @@
   "operators": {
     "selection": "roulette_wheel",
     "crossover": "one_point",
-    "crossover_boundary": "variable",
+    "crossover_boundary": "package",
     "mutation": "single_variable",
     "orientation_mutation": "rotate_90_degrees",
     "mutation_rate": 0.1,
     "elite_count": 0,
-    "repair": "greedy_bottom_up"
+    "repair": "bottom_up_reinsertion",
+    "repair_priority": "value_descending",
+    "repair_positions": "package_faces"
   },
   "result": {
     "initial_objective": 580,
-    "final_objective": 555,
+    "final_objective": 560,
     "initial_mean_objective": 551.2,
-    "final_mean_objective": 496.6,
+    "final_mean_objective": 546.4,
     "iterations": 100,
-    "duration_seconds": 14.6961011000094,
+    "duration_seconds": 15.374629899975844,
     "is_valid_final_state": true
   },
   "duration_scope": "population initialization and evolution; excludes IO and visualization"

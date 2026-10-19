@@ -139,9 +139,9 @@
       "height": 5,
       "max_capacity": 40
     },
-    "objective_score": 420,
-    "total_value": 420,
-    "total_weight": 31,
+    "objective_score": 555,
+    "total_value": 555,
+    "total_weight": 40,
     "inside_packages": [
       {
         "id": "A",
@@ -154,26 +154,26 @@
         "eta": 3,
         "position": {
           "x": 1,
-          "y": 4,
-          "z": 0
-        },
-        "orientation": "w:z,l:y,h:x"
-      },
-      {
-        "id": "B",
-        "width": 4,
-        "length": 3,
-        "height": 2,
-        "value": 120,
-        "weight": 9,
-        "is_fragile": false,
-        "eta": 2,
-        "position": {
-          "x": 0,
-          "y": 0,
+          "y": 1,
           "z": 0
         },
         "orientation": "w:z,l:x,h:y"
+      },
+      {
+        "id": "C",
+        "width": 3,
+        "length": 3,
+        "height": 2,
+        "value": 95,
+        "weight": 7,
+        "is_fragile": false,
+        "eta": 5,
+        "position": {
+          "x": 5,
+          "y": 1,
+          "z": 0
+        },
+        "orientation": "w:x,l:z,h:y"
       },
       {
         "id": "D",
@@ -185,24 +185,54 @@
         "is_fragile": false,
         "eta": 1,
         "position": {
-          "x": 3,
+          "x": 4,
+          "y": 5,
+          "z": 0
+        },
+        "orientation": "w:z,l:y,h:x"
+      },
+      {
+        "id": "E",
+        "width": 2,
+        "length": 2,
+        "height": 2,
+        "value": 70,
+        "weight": 5,
+        "is_fragile": true,
+        "eta": 4,
+        "position": {
+          "x": 4,
           "y": 3,
           "z": 0
         },
-        "orientation": "w:x,l:z,h:y"
+        "orientation": "w:y,l:x,h:z"
+      },
+      {
+        "id": "I",
+        "width": 3,
+        "length": 3,
+        "height": 1,
+        "value": 90,
+        "weight": 6,
+        "is_fragile": false,
+        "eta": 1,
+        "position": {
+          "x": 1,
+          "y": 4,
+          "z": 0
+        },
+        "orientation": "w:x,l:y,h:z"
       }
     ],
     "outside_packages": [
-      "C",
-      "E",
+      "B",
       "F",
       "G",
       "H",
-      "I",
       "J",
       "K",
       "L"
     ],
-    "chromosome": "114051000300600133010100000000001000123206103000000052005205"
+    "chromosome": "111030700215101145051430200000032000270011400000010530200000"
   }
 }

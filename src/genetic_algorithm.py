@@ -13,6 +13,7 @@ from src.core import (
     Truck,
     calculate_objective,
     generate_initial_state,
+    get_oriented_dimensions,
     is_valid_state,
     rotate_orientation,
     validate_state,
@@ -137,17 +138,48 @@ def roulette_wheel_selection(population: List[str], fitness_scores: List[int], r
 
 def repair_state(state: State) -> State:
     child = State(state.truck, state.packages, {}, state.additional_trucks)
+    packages = {package.id: package for package in state.packages}
     selected = [(package.id, state.placements[package.id]) for package in state.packages
                 if package.id in state.placements]
-    # shortcut: drops infeasible inherited genes, revisit reinsertion if solution quality stalls.
-    for package_id, placement in sorted(selected, key=lambda item: item[1].z):
+    for package_id, placement in sorted(selected, key=lambda item: (item[1].z, -packages[item[0]].value)):
         if placement.orientation not in ORIENTATIONS:
             continue
         candidate = child.copy()
         candidate.placements[package_id] = placement
         if is_valid_state(candidate):
             child = candidate
+    rejected = [(packages[package_id], placement) for package_id, placement in selected
+                if package_id not in child.placements and placement.orientation in ORIENTATIONS]
+    for package, placement in sorted(rejected, key=lambda item: -item[0].value):
+        child = _reinsert_package(child, package, placement)
     return child
+
+
+def _reinsert_package(state: State, package: Package, preferred: PlacedPackage) -> State:
+    packages = {item.id: item for item in state.packages}
+    width, length, height = get_oriented_dimensions(package, preferred.orientation)
+    for truck_index in sorted(range(len(state.trucks)), key=lambda index: index != preferred.truck_index):
+        truck = state.trucks[truck_index]
+        local = [(packages[package_id], placement) for package_id, placement in state.placements.items()
+                 if placement.truck_index == truck_index]
+        if (sum(item.weight for item, _ in local) + package.weight > truck.max_capacity
+                or width > truck.width or length > truck.length or height > truck.height):
+            continue
+        positions = {(0, 0, 0), preferred.position}
+        for item, placement in local:
+            item_width, item_length, item_height = get_oriented_dimensions(item, placement.orientation)
+            positions.update(((placement.x + item_width, placement.y, placement.z),
+                              (placement.x, placement.y + item_length, placement.z),
+                              (placement.x, placement.y, placement.z + item_height)))
+        # shortcut: checks package-face anchors, not every coordinate; expand if quality stalls.
+        for x, y, z in sorted(positions, key=lambda position: (position[2], position[1], position[0])):
+            if x < 0 or y < 0 or z < 0 or x + width > truck.width or y + length > truck.length or z + height > truck.height:
+                continue
+            candidate = state.copy()
+            candidate.placements[package.id] = PlacedPackage(x, y, z, preferred.orientation, truck_index)
+            if is_valid_state(candidate):
+                return candidate
+    return state
 
 
 def repair_chromosome(chromosome: str, codec: ChromosomeCodec) -> str:
@@ -155,10 +187,13 @@ def repair_chromosome(chromosome: str, codec: ChromosomeCodec) -> str:
     widths = codec.field_widths
     gene_width = sum(widths)
     genes = []
+    encoded = codec.encode(repaired)
     for index, package in enumerate(codec.packages):
         start = index * gene_width
         gene = chromosome[start:start + gene_width]
-        if package.id not in repaired.placements:
+        if package.id in repaired.placements:
+            gene = encoded[start:start + gene_width]
+        else:
             # Preserve candidate coordinates/orientation so later mutations can activate them.
             gene = "0" * widths[0] + gene[widths[0]:]
         genes.append(gene)
@@ -168,11 +203,10 @@ def repair_chromosome(chromosome: str, codec: ChromosomeCodec) -> str:
 def one_point_crossover(parent_a: str, parent_b: str, codec: ChromosomeCodec, rng: random.Random) -> str:
     if len(parent_a) != codec.chromosome_length or len(parent_b) != codec.chromosome_length:
         raise ValueError("parents must have the expected chromosome length")
-    widths = codec.field_widths * len(codec.packages)
-    if len(widths) < 2:
+    if len(codec.packages) < 2:
         return parent_a
-    # Cut between variables so a multi-digit coordinate remains a complete field.
-    cut = sum(widths[:rng.randrange(1, len(widths))])
+    # Inherit each package's truck, position, and orientation from the same parent.
+    cut = rng.randrange(1, len(codec.packages)) * sum(codec.field_widths)
     return parent_a[:cut] + parent_b[cut:]
 
 
@@ -256,9 +290,10 @@ def genetic_algorithm(
             "initial_chromosome": initial_chromosome,
             "final_chromosome": best,
             "operators": {"selection": "roulette_wheel", "crossover": "one_point",
-                "crossover_boundary": "variable", "mutation": "single_variable",
+                "crossover_boundary": "package", "mutation": "single_variable",
                 "orientation_mutation": "rotate_90_degrees",
-                "mutation_rate": MUTATION_RATE, "elite_count": 0, "repair": "greedy_bottom_up"},
+                "mutation_rate": MUTATION_RATE, "elite_count": 0, "repair": "bottom_up_reinsertion",
+                "repair_priority": "value_descending", "repair_positions": "package_faces"},
             "is_valid_final_state": is_valid_state(final_state),
         },
     )

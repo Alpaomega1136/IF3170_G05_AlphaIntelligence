@@ -139,9 +139,9 @@
       "height": 5,
       "max_capacity": 40
     },
-    "objective_score": 470,
-    "total_value": 470,
-    "total_weight": 35,
+    "objective_score": 525,
+    "total_value": 525,
+    "total_weight": 39,
     "inside_packages": [
       {
         "id": "A",
@@ -154,26 +154,42 @@
         "eta": 3,
         "position": {
           "x": 0,
-          "y": 4,
+          "y": 3,
           "z": 0
         },
-        "orientation": "w:x,l:z,h:y"
+        "orientation": "w:y,l:x,h:z"
       },
       {
-        "id": "B",
-        "width": 4,
+        "id": "C",
+        "width": 3,
         "length": 3,
         "height": 2,
-        "value": 120,
-        "weight": 9,
+        "value": 95,
+        "weight": 7,
         "is_fragile": false,
-        "eta": 2,
+        "eta": 5,
+        "position": {
+          "x": 4,
+          "y": 3,
+          "z": 0
+        },
+        "orientation": "w:z,l:y,h:x"
+      },
+      {
+        "id": "D",
+        "width": 5,
+        "length": 3,
+        "height": 2,
+        "value": 160,
+        "weight": 12,
+        "is_fragile": false,
+        "eta": 1,
         "position": {
           "x": 0,
           "y": 0,
           "z": 0
         },
-        "orientation": "w:y,l:x,h:z"
+        "orientation": "w:z,l:y,h:x"
       },
       {
         "id": "J",
@@ -185,39 +201,23 @@
         "is_fragile": false,
         "eta": 5,
         "position": {
-          "x": 4,
-          "y": 6,
-          "z": 0
-        },
-        "orientation": "w:z,l:y,h:x"
-      },
-      {
-        "id": "K",
-        "width": 2,
-        "length": 3,
-        "height": 2,
-        "value": 80,
-        "weight": 6,
-        "is_fragile": false,
-        "eta": 4,
-        "position": {
-          "x": 4,
-          "y": 2,
+          "x": 2,
+          "y": 0,
           "z": 0
         },
         "orientation": "w:x,l:y,h:z"
       }
     ],
     "outside_packages": [
-      "C",
-      "D",
+      "B",
       "E",
       "F",
       "G",
       "H",
       "I",
+      "K",
       "L"
     ],
-    "chromosome": "104011000200003007150630503510006030000104304146051420000743"
+    "chromosome": "103020041014305100050050505004000200300202203120000000000540"
   }
 }

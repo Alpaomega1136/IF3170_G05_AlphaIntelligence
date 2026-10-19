@@ -124,26 +124,10 @@
       "height": 5,
       "max_capacity": 40
     },
-    "objective_score": 430,
-    "total_value": 430,
-    "total_weight": 32,
+    "objective_score": 550,
+    "total_value": 550,
+    "total_weight": 40,
     "inside_packages": [
-      {
-        "id": "B",
-        "width": 4,
-        "length": 3,
-        "height": 2,
-        "value": 120,
-        "weight": 9,
-        "is_fragile": false,
-        "eta": 2,
-        "position": {
-          "x": 0,
-          "y": 0,
-          "z": 0
-        },
-        "orientation": "w:x,l:z,h:y"
-      },
       {
         "id": "C",
         "width": 3,
@@ -154,24 +138,56 @@
         "is_fragile": false,
         "eta": 5,
         "position": {
-          "x": 3,
+          "x": 5,
           "y": 4,
           "z": 0
         },
-        "orientation": "w:y,l:z,h:x"
+        "orientation": "w:z,l:x,h:y"
       },
       {
-        "id": "F",
-        "width": 3,
-        "length": 2,
+        "id": "D",
+        "width": 5,
+        "length": 3,
         "height": 2,
-        "value": 85,
+        "value": 160,
+        "weight": 12,
+        "is_fragile": false,
+        "eta": 1,
+        "position": {
+          "x": 2,
+          "y": 0,
+          "z": 0
+        },
+        "orientation": "w:x,l:y,h:z"
+      },
+      {
+        "id": "G",
+        "width": 4,
+        "length": 2,
+        "height": 1,
+        "value": 75,
+        "weight": 5,
+        "is_fragile": false,
+        "eta": 2,
+        "position": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "orientation": "w:z,l:x,h:y"
+      },
+      {
+        "id": "I",
+        "width": 3,
+        "length": 3,
+        "height": 1,
+        "value": 90,
         "weight": 6,
         "is_fragile": false,
-        "eta": 6,
+        "eta": 1,
         "position": {
-          "x": 5,
-          "y": 3,
+          "x": 7,
+          "y": 0,
           "z": 0
         },
         "orientation": "w:z,l:y,h:x"
@@ -186,23 +202,22 @@
         "is_fragile": false,
         "eta": 5,
         "position": {
-          "x": 1,
-          "y": 4,
+          "x": 0,
+          "y": 1,
           "z": 0
         },
-        "orientation": "w:z,l:x,h:y"
+        "orientation": "w:y,l:z,h:x"
       }
     ],
     "outside_packages": [
       "A",
-      "D",
+      "B",
       "E",
-      "G",
+      "F",
       "H",
-      "I",
       "K",
       "L"
     ],
-    "chromosome": "002001000113404034250310515305000150553500000114030034002735"
+    "chromosome": "005000002015403120000000005712100030000517005101040010003543"
   }
 }

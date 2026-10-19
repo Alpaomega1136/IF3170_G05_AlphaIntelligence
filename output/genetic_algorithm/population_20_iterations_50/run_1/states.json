@@ -124,9 +124,9 @@
       "height": 5,
       "max_capacity": 40
     },
-    "objective_score": 435,
-    "total_value": 435,
-    "total_weight": 31,
+    "objective_score": 550,
+    "total_value": 550,
+    "total_weight": 40,
     "inside_packages": [
       {
         "id": "C",
@@ -138,37 +138,37 @@
         "is_fragile": false,
         "eta": 5,
         "position": {
-          "x": 3,
+          "x": 2,
           "y": 4,
-          "z": 0
-        },
-        "orientation": "w:y,l:z,h:x"
-      },
-      {
-        "id": "E",
-        "width": 2,
-        "length": 2,
-        "height": 2,
-        "value": 70,
-        "weight": 5,
-        "is_fragile": true,
-        "eta": 4,
-        "position": {
-          "x": 3,
-          "y": 1,
           "z": 0
         },
         "orientation": "w:z,l:y,h:x"
       },
       {
-        "id": "F",
-        "width": 3,
-        "length": 2,
+        "id": "D",
+        "width": 5,
+        "length": 3,
         "height": 2,
-        "value": 85,
-        "weight": 6,
+        "value": 160,
+        "weight": 12,
         "is_fragile": false,
-        "eta": 6,
+        "eta": 1,
+        "position": {
+          "x": 2,
+          "y": 0,
+          "z": 0
+        },
+        "orientation": "w:x,l:y,h:z"
+      },
+      {
+        "id": "G",
+        "width": 4,
+        "length": 2,
+        "height": 1,
+        "value": 75,
+        "weight": 5,
+        "is_fragile": false,
+        "eta": 2,
         "position": {
           "x": 5,
           "y": 4,
@@ -177,18 +177,18 @@
         "orientation": "w:z,l:x,h:y"
       },
       {
-        "id": "H",
-        "width": 2,
-        "length": 2,
+        "id": "I",
+        "width": 3,
+        "length": 3,
         "height": 1,
-        "value": 55,
-        "weight": 3,
-        "is_fragile": true,
-        "eta": 3,
+        "value": 90,
+        "weight": 6,
+        "is_fragile": false,
+        "eta": 1,
         "position": {
-          "x": 5,
-          "y": 5,
-          "z": 3
+          "x": 7,
+          "y": 0,
+          "z": 0
         },
         "orientation": "w:z,l:y,h:x"
       },
@@ -202,22 +202,22 @@
         "is_fragile": false,
         "eta": 5,
         "position": {
-          "x": 1,
-          "y": 4,
+          "x": 0,
+          "y": 1,
           "z": 0
         },
-        "orientation": "w:z,l:x,h:y"
+        "orientation": "w:y,l:z,h:x"
       }
     ],
     "outside_packages": [
       "A",
       "B",
-      "D",
-      "G",
-      "I",
+      "E",
+      "F",
+      "H",
       "K",
       "L"
     ],
-    "chromosome": "000000000013404033201310515403000051553500000114030000001735"
+    "chromosome": "000000000012405120000000005002154030000517005101040000003501"
   }
 }

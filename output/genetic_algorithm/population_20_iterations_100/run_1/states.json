@@ -124,26 +124,10 @@
       "height": 5,
       "max_capacity": 40
     },
-    "objective_score": 485,
-    "total_value": 485,
-    "total_weight": 35,
+    "objective_score": 550,
+    "total_value": 550,
+    "total_weight": 40,
     "inside_packages": [
-      {
-        "id": "B",
-        "width": 4,
-        "length": 3,
-        "height": 2,
-        "value": 120,
-        "weight": 9,
-        "is_fragile": false,
-        "eta": 2,
-        "position": {
-          "x": 0,
-          "y": 0,
-          "z": 0
-        },
-        "orientation": "w:x,l:y,h:z"
-      },
       {
         "id": "C",
         "width": 3,
@@ -154,41 +138,57 @@
         "is_fragile": false,
         "eta": 5,
         "position": {
-          "x": 3,
-          "y": 4,
-          "z": 0
-        },
-        "orientation": "w:y,l:z,h:x"
-      },
-      {
-        "id": "F",
-        "width": 3,
-        "length": 2,
-        "height": 2,
-        "value": 85,
-        "weight": 6,
-        "is_fragile": false,
-        "eta": 6,
-        "position": {
-          "x": 5,
+          "x": 2,
           "y": 4,
           "z": 0
         },
         "orientation": "w:z,l:x,h:y"
       },
       {
-        "id": "H",
-        "width": 2,
+        "id": "D",
+        "width": 5,
+        "length": 3,
+        "height": 2,
+        "value": 160,
+        "weight": 12,
+        "is_fragile": false,
+        "eta": 1,
+        "position": {
+          "x": 2,
+          "y": 0,
+          "z": 0
+        },
+        "orientation": "w:x,l:y,h:z"
+      },
+      {
+        "id": "G",
+        "width": 4,
         "length": 2,
         "height": 1,
-        "value": 55,
-        "weight": 3,
-        "is_fragile": true,
-        "eta": 3,
+        "value": 75,
+        "weight": 5,
+        "is_fragile": false,
+        "eta": 2,
         "position": {
-          "x": 5,
+          "x": 2,
+          "y": 3,
+          "z": 0
+        },
+        "orientation": "w:x,l:z,h:y"
+      },
+      {
+        "id": "I",
+        "width": 3,
+        "length": 3,
+        "height": 1,
+        "value": 90,
+        "weight": 6,
+        "is_fragile": false,
+        "eta": 1,
+        "position": {
+          "x": 6,
           "y": 5,
-          "z": 3
+          "z": 0
         },
         "orientation": "w:z,l:y,h:x"
       },
@@ -202,22 +202,22 @@
         "is_fragile": false,
         "eta": 5,
         "position": {
-          "x": 1,
-          "y": 4,
+          "x": 0,
+          "y": 1,
           "z": 0
         },
-        "orientation": "w:z,l:x,h:y"
+        "orientation": "w:y,l:z,h:x"
       }
     ],
     "outside_packages": [
       "A",
-      "D",
+      "B",
       "E",
-      "G",
-      "I",
+      "F",
+      "H",
       "K",
       "L"
     ],
-    "chromosome": "002001000013404033200310515403000051553500000114030030002735"
+    "chromosome": "005000002012403120000000005002123010000516505101040000003501"
   }
 }
